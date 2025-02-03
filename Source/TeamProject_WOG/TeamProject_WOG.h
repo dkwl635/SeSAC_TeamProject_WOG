@@ -23,3 +23,4 @@ enum class ETraceChannel : uint8
 	PlayerAttackTrace = ECC_GameTraceChannel5 ,
 	EnemyAttackTrace = ECC_GameTraceChannel6
 };
+
