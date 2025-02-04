@@ -24,3 +24,25 @@ enum class ETraceChannel : uint8
 	EnemyAttackTrace = ECC_GameTraceChannel6
 };
 
+
+UENUM(BlueprintType)
+enum class EThorPattern : uint8
+{
+    NONE ,
+    SPAWN ,
+    IDLE ,
+    MOVE ,
+    DASH ,
+    //ATTACK_ACTION
+    ATTACK_TRIPLE_STRIKE_COMBO ,
+    ATTACK_PUNCH_AND_KICK_COMBO ,
+    ATTACK_THUNDER_CLAP ,
+    ATTACK_TRIPLE_HAMMER_STRIKES ,
+    ATTACK_TRIPLE_LIGHTING_STRIKES ,
+    //DAMGE_ACTION
+    HIT ,
+    STUN ,
+    DEATH ,
+
+    MAX ,
+};
