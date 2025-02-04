@@ -21,6 +21,6 @@ protected:
 	void EndPattern_C() override;
 	bool TickPattern_C() override;
 
-
-
+	
+	
 };

@@ -15,10 +15,13 @@ void UThorPattern::StartPattern()
 {
 	StartPattern_C();
 	StartPattern_BP();
+	
 }
 
 void UThorPattern::StopPattern()
 {
+	StopPattern_C();
+	StopPattern_BP();
 }
 
 void UThorPattern::EndPattern()
@@ -69,6 +72,4 @@ void UThorPattern::EndPattern_BP_Implementation()
 
 void UThorPattern::TickPattern_BP_Implementation()
 {
-	
 }
-

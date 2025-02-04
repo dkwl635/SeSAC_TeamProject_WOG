@@ -6,6 +6,7 @@
 void UThor_Move::StartPattern_C()
 {
 	Owner->SetIsMove(true);
+	UE_LOG(LogTemp, Warning, TEXT("StartPattern_C_MOVE"));
 }
 
 void UThor_Move::StopPattern_C()
@@ -22,3 +23,4 @@ bool UThor_Move::TickPattern_C()
 {
 	return false;
 }
+

@@ -30,36 +30,36 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+//토르 구조
 public:
 	UPROPERTY(EditAnywhere)
 	class UCapsuleComponent* BodyCollision;
 
 	UPROPERTY(EditAnywhere)
 	class USkeletalMeshComponent* BodyComp;
+//애니메이션 관련
 private:
 	UPROPERTY()
 	class UThorAnimInstance* ThorAnimIns;
 public:
 	void SetIsMove(bool Isbool);
-	
+
+//크레토스가 들어갈 공간	
 public:
-	//크레토스가 들어갈 공간
 	UPROPERTY()
 	AActor* Target;
 
+//WOG 전투 관련 인터페이스
 public:
-	
-
-private:
-	UPROPERTY(VisibleAnywhere)
-	EWOG_Character_State CharacterState = EWOG_Character_State::NONE;
-public:
-	//WOG 전투 관련 인터페이스
 	virtual EWOG_Character_State GetCharacterState() override;
 	virtual void TakeKDamage( const FWOG_DamageEvent& KDamageEvent) override;
 	virtual class USkeletalMeshComponent* GetSkeletalMesh() override;
 	virtual AActor* GetActor() override { return this; };
 
+//토르 패턴 컨트롤
+private:
+	UPROPERTY(VisibleAnywhere)
+	EWOG_Character_State CharacterState = EWOG_Character_State::NONE;
 public:
 	UPROPERTY(EditAnywhere , Category = PatternClass)
 	TArray<TSubclassOf<class UThorPattern>> PatternClass;
