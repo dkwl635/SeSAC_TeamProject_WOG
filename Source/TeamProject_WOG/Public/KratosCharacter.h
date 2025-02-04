@@ -1,9 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputActionValue.h"
 #include "KratosCharacter.generated.h"
 
 UCLASS()
@@ -25,5 +26,43 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+// 2. Camera
+public:
+	UPROPERTY( EditDefaultsOnly , Category = Camera)
+	class USpringArmComponent* springArmComp;
+
+	UPROPERTY(EditAnywhere, Category = Camera)
+	class UCameraComponent* KratosCamComp;
+	
+// Camera Input
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputMappingContext* IMC_Kratos;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_LookUp;
+
+	UPROPERTY( EditDefaultsOnly , Category = "Input" )
+	class UInputAction* IA_Turn;
+
+	void Turn(const FInputActionValue& inputValue);
+
+	void LookUp(const FInputActionValue& inputValue);
+
+// 3. Movement Input
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Move;
+
+	// 이동 속도
+	UPROPERTY(EditAnywhere, Category = PlayerSettings)
+	float WalkSpeed = 600.0f;
+
+	// 이동 방향
+	FVector Direction;
+
+	void Move(const FInputActionValue& inputValue);
+
 
 };
