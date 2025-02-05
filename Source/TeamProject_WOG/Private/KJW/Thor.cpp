@@ -86,7 +86,7 @@ void AThor::InitPatternClass()
 		}
 	}
 
-	StartPattarn(EThorPattern::MOVE);
+	StartPattarn(EThorPattern::IDLE);
 }
 
 

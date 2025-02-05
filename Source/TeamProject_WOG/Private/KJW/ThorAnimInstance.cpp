@@ -12,7 +12,7 @@ void UThorAnimInstance::NativeInitializeAnimation()
 		Thor = Cast<AThor>(owner);
 		if (Thor)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("NativeInitializeAnimation"));
+		
 		}
 	}
 	
