@@ -26,8 +26,11 @@ void AThor::BeginPlay()
 	Super::BeginPlay();
 
 	ThorAnimIns = Cast<UThorAnimInstance>(GetSkeletalMesh()->GetAnimInstance());
-
+	ThorAnimIns->OnMontageEnded.AddDynamic(this , &ThisClass::OnMontageEnded);
 	InitPatternClass();
+
+	Target = GetWorld()->GetFirstPlayerController()->GetPawn();
+	if ( Target ) { UE_LOG(LogTemp , Warning , TEXT("Is Target")); }
 }
 
 // Called every frame
@@ -136,7 +139,13 @@ void AThor::StartPattarn(EThorPattern NewPattern)
 
 void AThor::ChangePattarn(EThorPattern NewPattern)
 {
-	
+	if ( CurPattern )
+	{
+		CurPattern->StopPattern();
+	}
+
+	StartPattarn(NewPattern);
+
 }
 
 void AThor::EndPattarn(EThorPattern NewPattern)
@@ -171,6 +180,21 @@ void AThor::NotifyTickPattrern(int32 EventIndex, float FrameDeltaTime)
 	if (!CurPattern) { return; }
 	CurPattern->NotifyTickPattrern(EventIndex , FrameDeltaTime);
 }
+
+void AThor::OnMontageEnded(UAnimMontage* Montage , bool bInterrupted)
+{
+	if ( bInterrupted )
+	{
+		//UE_LOG(LogTemp , Warning , TEXT("몽타주가 강제 종료됨!"));
+		CurPattern->StopPattern();
+	}
+	else
+	{
+		//UE_LOG(LogTemp , Log , TEXT("몽타주가 정상적으로 끝남!"));
+		EndPattarn(CurPattern->ThorPattern);
+	}
+}
+
 
 
 

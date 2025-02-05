@@ -32,16 +32,17 @@ public:
 
 //토르 구조
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UCapsuleComponent* BodyCollision;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USkeletalMeshComponent* BodyComp;
 //애니메이션 관련
 private:
 	UPROPERTY()
 	class UThorAnimInstance* ThorAnimIns;
 public:
+	
 	void SetIsMove(bool Isbool);
 
 //크레토스가 들어갈 공간	
@@ -64,18 +65,26 @@ public:
 	UPROPERTY(EditAnywhere , Category = PatternClass)
 	TArray<TSubclassOf<class UThorPattern>> PatternClass;
 	void InitPatternClass();
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void ChangePattarn(EThorPattern NewPattern);
+	UFUNCTION(BlueprintCallable)
+	void StartPattarn(EThorPattern NewPattern);
+	UFUNCTION(BlueprintCallable)
+	void TickPattarn();
+	UFUNCTION(BlueprintCallable)
+	void EndPattarn(EThorPattern NewPattern);
 private:
 	UPROPERTY()
 	class UThorPattern* CurPattern;
 	UPROPERTY()
 	TMap<EThorPattern , class UThorPattern*> Patterns;
-	
+
 	class UThorPattern* GetPattern(EThorPattern Pattern);
 
-	void TickPattarn();
-	void StartPattarn(EThorPattern NewPattern);
-	void ChangePattarn(EThorPattern NewPattern);
-	void EndPattarn(EThorPattern NewPattern);
+
+
 	UFUNCTION(BlueprintCallable)
 	void NotifyEventPattern(int32 EventIndex);
 	UFUNCTION(BlueprintCallable)
@@ -86,7 +95,9 @@ private:
 	void NotifyTickPattrern(int32 EventIndex, float FrameDeltaTime);
 
 public:
-	
+	UFUNCTION()
+	void OnMontageEnded(UAnimMontage* Montage , bool bInterrupted);
+
 	
 	
 	
