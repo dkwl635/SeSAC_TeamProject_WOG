@@ -24,6 +24,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* AnimMontage;
 
+	UPROPERTY(EditAnywhere)
+	float Walk_speed = 500.f;
+
+	UPROPERTY(EditAnywhere)
+	float Damage = 10.0f;
+
 public:
 	virtual void NotifyEventPattern_C(int32 EventIndex) override;
 	virtual  void NotifyTickPattrern_C(int32 EventIndex , float FrameDeltaTime) override;

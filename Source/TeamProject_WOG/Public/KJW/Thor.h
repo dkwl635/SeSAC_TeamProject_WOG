@@ -99,6 +99,8 @@ public:
 	void OnMontageEnded(UAnimMontage* Montage , bool bInterrupted);
 
 	
+public:
+	FVector GetMoveRandomPos(FVector SpawnPos , float MapSize , float Dist);
 	
 	
 };

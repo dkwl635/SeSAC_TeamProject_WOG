@@ -14,6 +14,8 @@ class TEAMPROJECT_WOG_API UThor_Move : public UThorPattern
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void InitPattern(class AThor* Thor) override;
 	
 protected:
 	void StartPattern_C() override;
@@ -23,5 +25,15 @@ protected:
 
 	virtual void NotifyEventPattern_C(int32 EventIndex) override;
 
+public:
+	FVector SpawnPos = FVector::ZeroVector;
+	FVector MovePos = FVector::ZeroVector;
+	FVector Direction = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere)
+	float MapSize = 1000.0f;
+	
+	UPROPERTY(EditAnywhere)
+	float WalkSpeed = 300.0f;
 	
 };

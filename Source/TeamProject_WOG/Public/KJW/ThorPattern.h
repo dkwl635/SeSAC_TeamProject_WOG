@@ -21,7 +21,7 @@ public:
     UPROPERTY(EditAnywhere)
     EThorPattern ThorPattern = EThorPattern::NONE;
 public:
-    void InitPattern(class AThor* Thor);
+    virtual void InitPattern(class AThor* Thor);
 public:
     void StartPattern(); //시작시 호출되는
     void StopPattern(); //중단시 호출되는

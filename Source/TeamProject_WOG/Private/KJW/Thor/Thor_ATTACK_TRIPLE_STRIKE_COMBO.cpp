@@ -64,11 +64,7 @@ void UThor_ATTACK_TRIPLE_STRIKE_COMBO::NotifyTickPattrern_C(int32 EventIndex, fl
 
 		FRotator rot = Dir.Rotation();
 		Owner->SetActorRotation(rot);
-
-
-		float speed = 500;
-
-		Owner->SetActorLocation(Owner->GetActorLocation() + (Dir * 500 * FrameDeltaTime));
+		Owner->SetActorLocation(Owner->GetActorLocation() + (Dir * Walk_speed * FrameDeltaTime));
 
 	}
 

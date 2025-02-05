@@ -38,6 +38,10 @@ void AThor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if ( CurPattern )
+	{
+		CurPattern->TickPattern();
+	}
 }
 
 // Called to bind functionality to input
@@ -193,6 +197,21 @@ void AThor::OnMontageEnded(UAnimMontage* Montage , bool bInterrupted)
 		//UE_LOG(LogTemp , Log , TEXT("몽타주가 정상적으로 끝남!"));
 		EndPattarn(CurPattern->ThorPattern);
 	}
+}
+
+FVector AThor::GetMoveRandomPos(FVector SpawnPos , float MapSize , float Dist)
+{
+	FVector Result = FVector::ZeroVector;
+	MapSize /= 2;
+	FVector2D RandPos = FMath::RandPointInCircle(1) * Dist;
+	Result.X = SpawnPos.X + RandPos.X;
+	Result.Y = SpawnPos.Y + RandPos.Y;
+
+	Result.X = FMath::Clamp(Result.X , -MapSize , MapSize);
+	Result.Y = FMath::Clamp(Result.Y , -MapSize , MapSize);
+	
+	return Result;
+
 }
 
 
