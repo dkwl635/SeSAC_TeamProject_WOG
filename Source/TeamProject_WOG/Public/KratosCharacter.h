@@ -64,5 +64,37 @@ public:
 
 	void Move(const FInputActionValue& inputValue);
 
+// 4. Weapon & Attack Input
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Weapon;
 
+	void EquipAction(const FInputActionValue& inputValue);
+	void AttackAction();
+
+	UPROPERTY(EditAnywhere , Category = AnimMontage)
+	UAnimMontage* Equip_Axe_Montage;
+
+	UPROPERTY(EditAnywhere , Category = AnimMontage)
+	UAnimMontage* Attack_Axe_Montage;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_UnequipWeapon;
+
+	void UnEquipAction(const FInputActionValue& inputValue);
+
+	// Default Settings
+	UPROPERTY(EditDefaultsOnly, Category = PlayerSettings)
+	bool Kratos_HasWeapon = true;
+
+	UPROPERTY(EditDefaultsOnly, Category = PlayerSettings)
+	bool Kratos_EquippedWeapon = false;
+
+	UPROPERTY(EditAnywhere, Category = AnimMontage)
+	UAnimMontage* UnEquip_Axe_Montage;
+
+public:
+	UFUNCTION(BlueprintPure)
+	bool Get_KratosEquippedWeapon() const;
 };

@@ -13,21 +13,19 @@ AKratosCharacter::AKratosCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// TPS 카메라를 붙이고 싶다.
-	// SpringArm 컴포넌트 붙이기
+	// 1. 카메라 컴포넌트
+	// SpringArm 컴포넌트
 	springArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	springArmComp->SetupAttachment(RootComponent);
 	springArmComp->SetRelativeLocation(FVector(0.0f , 60.0f , 80.0f));
 	springArmComp->TargetArmLength = 300.0f;
 
-	//카메라 회전(02/04(화))
 	springArmComp->bUsePawnControlRotation = true;
 
-	// Camera 컴포넌트 붙이기
+	// Camera 컴포넌트
 	KratosCamComp = CreateDefaultSubobject<UCameraComponent>(TEXT("KratosCamComp"));
 	KratosCamComp->SetupAttachment(springArmComp);
 
-	//카메라 회전(02/04(화))
 	KratosCamComp->bUsePawnControlRotation = false;
 
 	bUseControllerRotationPitch = false;
@@ -72,9 +70,14 @@ void AKratosCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	if ( PlayerInput )
 	{
+		// 1. 플레이어 이동 및 카메라
 		PlayerInput->BindAction(IA_Turn , ETriggerEvent::Triggered , this , &AKratosCharacter::Turn);
 		PlayerInput->BindAction(IA_LookUp , ETriggerEvent::Triggered , this , &AKratosCharacter::LookUp);
 		PlayerInput->BindAction(IA_Move , ETriggerEvent::Triggered , this , &AKratosCharacter::Move);
+
+		// 2. 플레이어 공격 및 무기 장착
+		PlayerInput->BindAction(IA_Weapon, ETriggerEvent::Completed, this, &AKratosCharacter::EquipAction);
+		PlayerInput->BindAction(IA_UnequipWeapon , ETriggerEvent::Completed , this , &AKratosCharacter::UnEquipAction);
 	}
 
 }
@@ -99,4 +102,49 @@ void AKratosCharacter::Move(const FInputActionValue& inputValue)
 	// 좌우 입력 처리
 	Direction.Y = value.Y;
 }
+
+// 무기 장착
+void AKratosCharacter::EquipAction(const FInputActionValue& inputValue)
+{
+	if ( Kratos_HasWeapon == true ) {
+		if ( Kratos_EquippedWeapon == true ) {
+			AttackAction();
+		}
+		else {
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			AnimInstance->Montage_Play(Equip_Axe_Montage);
+
+			Kratos_EquippedWeapon = true;
+		}
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1 , 2.0f , FColor::Red , TEXT("No Weapon"));
+	}
+}
+
+// 공격
+void AKratosCharacter::AttackAction()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(Attack_Axe_Montage);
+}
+
+// 무기 장착 해제
+void AKratosCharacter::UnEquipAction(const FInputActionValue& inputValue)
+{
+	if ( Kratos_HasWeapon == true ) {
+		if ( Kratos_EquippedWeapon == true ) {
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			AnimInstance->Montage_Play(UnEquip_Axe_Montage);
+			Kratos_EquippedWeapon = false;
+		}
+	}
+}
+
+bool AKratosCharacter::Get_KratosEquippedWeapon() const
+{
+	return Kratos_EquippedWeapon;
+}
+
+
 
