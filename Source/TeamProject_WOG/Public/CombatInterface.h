@@ -23,7 +23,7 @@ public:
 UENUM(BlueprintType)
 enum class EWOG_Character_State : uint8
 {
-	NONE ,
+	NONE ,//아무것도 아님
 	IDLE , //평소 상태
 	STUN , //그로기(스턴) 상태
 	GRAB , //잡힌 상태
@@ -44,11 +44,15 @@ class UCombatInterface : public UInterface
 class TEAMPROJECT_WOG_API ICombatInterface
 {
 	GENERATED_BODY()
-
-	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
+protected:
+	EWOG_Character_State CharacterState = EWOG_Character_State::NONE;
+	
+// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	//현제 상태 리턴
-	virtual  EWOG_Character_State GetCharacterState() = 0;
+	EWOG_Character_State GetCharacterState() { return CharacterState;}
+	//상태 변경시키는 함수
+	virtual void SetCharacterState(EWOG_Character_State NewState) = 0;
 	//WOG 전용 데미지 주는 함수
 	virtual void TakeKDamage(const FWOG_DamageEvent& DamageEvent , ICombatInterface* DamageCauser) = 0;
 	//애니메이션을 강제로 시켜야할경우

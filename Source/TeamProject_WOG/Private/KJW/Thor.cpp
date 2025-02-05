@@ -49,10 +49,9 @@ void AThor::SetIsMove(bool Isbool)
 }
 
 
-
-EWOG_Character_State AThor::GetCharacterState()
+void AThor::SetCharacterState(EWOG_Character_State NewState)
 {
-	return EWOG_Character_State::NONE;
+
 }
 
 void AThor::TakeKDamage( const FWOG_DamageEvent& DamageEvent, ICombatInterface* DamageCauser)
@@ -112,6 +111,7 @@ void AThor::InitPatternClass()
 
 UThorPattern* AThor::GetPattern(EThorPattern PatternType)
 {
+	//등록된 패턴 가져오기
 	if (!Patterns.Contains(PatternType)) { return nullptr; }
 
 	return Patterns[PatternType];
