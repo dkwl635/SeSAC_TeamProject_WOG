@@ -105,7 +105,7 @@ void AThor::InitPatternClass()
 		}
 	}
 
-	StartPattarn(EThorPattern::IDLE);
+	StartPattarn(EThorPattern::MOVE);
 }
 
 
@@ -146,6 +146,30 @@ void AThor::EndPattarn(EThorPattern NewPattern)
 
 	End->EndPattern();
 
+}
+
+void AThor::NotifyEventPattern(int32 EventIndex)
+{
+	if (!CurPattern) { return; }
+	CurPattern->NotifyEventPattern(EventIndex);
+}
+
+void AThor::NotifyBeginPattern(int32 EventIndex,float TotalDuration)
+{
+	if (!CurPattern) { return; }
+	CurPattern->NotifyBeginPattern(EventIndex ,TotalDuration);
+}
+
+void AThor::NotifyEndPattrern(int32 EventIndex)
+{
+	if (!CurPattern) { return; }
+	CurPattern->NotifyEndPattrern(EventIndex);
+}
+
+void AThor::NotifyTickPattrern(int32 EventIndex, float FrameDeltaTime)
+{
+	if (!CurPattern) { return; }
+	CurPattern->NotifyTickPattrern(EventIndex , FrameDeltaTime);
 }
 
 

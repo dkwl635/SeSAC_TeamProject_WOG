@@ -21,6 +21,7 @@ protected:
 	void EndPattern_C() override;
 	bool TickPattern_C() override;
 
-	
+	virtual void NotifyEventPattern_C(int32 EventIndex) override;
+
 	
 };

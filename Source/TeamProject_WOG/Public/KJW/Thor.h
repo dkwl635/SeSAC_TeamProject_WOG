@@ -55,6 +55,7 @@ public:
 	virtual void TakeKDamage( const FWOG_DamageEvent& DamageEvent , ICombatInterface* DamageCauser) override;
 	virtual class USkeletalMeshComponent* GetSkeletalMesh() override;
 	virtual AActor* GetActor() override { return this; };
+	
 	void TestDamageEvnet(AActor* DamageTarget);
 
 //토르 패턴 컨트롤
@@ -75,6 +76,18 @@ private:
 	void StartPattarn(EThorPattern NewPattern);
 	void ChangePattarn(EThorPattern NewPattern);
 	void EndPattarn(EThorPattern NewPattern);
+	UFUNCTION(BlueprintCallable)
+	void NotifyEventPattern(int32 EventIndex);
+	UFUNCTION(BlueprintCallable)
+	void NotifyBeginPattern(int32 EventIndex , float TotalDuration);
+	UFUNCTION(BlueprintCallable)
+	void NotifyEndPattrern(int32 EventIndex);
+	UFUNCTION(BlueprintCallable)
+	void NotifyTickPattrern(int32 EventIndex, float FrameDeltaTime);
+
+public:
+	
+	
 	
 	
 };

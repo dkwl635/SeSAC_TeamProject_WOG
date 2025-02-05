@@ -24,3 +24,8 @@ bool UThor_Move::TickPattern_C()
 	return false;
 }
 
+void UThor_Move::NotifyEventPattern_C(int32 EventIndex)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Move_NotifyBeginPattern_C"));
+}
+

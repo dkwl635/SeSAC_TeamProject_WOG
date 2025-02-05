@@ -41,6 +41,31 @@ void UThorPattern::TickPattern()
 	TickPattern_BP();
 }
 
+void UThorPattern::NotifyEventPattern(int32 EventIndex)
+{
+	NotifyEventPattern_C(EventIndex);
+	NotifyEventPattern_BP(EventIndex);
+}
+
+void UThorPattern::NotifyBeginPattern(int32 EventIndex ,float TotalDuration)
+{
+	NotifyBeginPattern_C(EventIndex , TotalDuration);
+	NotifyBeginPattern_BP(EventIndex , TotalDuration);
+}
+
+
+void UThorPattern::NotifyEndPattrern(int32 EventIndex)
+{
+	NotifyEndPattrern_C(EventIndex);
+	NotifyEndPattrern_BP(EventIndex);
+}
+
+void UThorPattern::NotifyTickPattrern(int32 EventIndex , float FrameDeltaTime)
+{
+	NotifyTickPattrern_C(EventIndex, FrameDeltaTime);
+	NotifyTickPattrern_BP(EventIndex,  FrameDeltaTime);
+}
+
 void UThorPattern::StartPattern_C()
 {
 }
@@ -58,6 +83,22 @@ bool UThorPattern::TickPattern_C()
 	return true;
 }
 
+void UThorPattern::NotifyEventPattern_C(int32 EventIndex)
+{
+}
+
+void UThorPattern::NotifyBeginPattern_C(int32 EventIndex, float TotalDuration)
+{
+}
+
+void UThorPattern::NotifyEndPattrern_C(int32 EventIndex)
+{
+}
+
+void UThorPattern::NotifyTickPattrern_C(int32 EventIndex, float FrameDeltaTime)
+{
+}
+
 void UThorPattern::StartPattern_BP_Implementation()
 {
 }
@@ -71,5 +112,21 @@ void UThorPattern::EndPattern_BP_Implementation()
 }
 
 void UThorPattern::TickPattern_BP_Implementation()
+{
+}
+
+void UThorPattern::NotifyEventPattern_BP_Implementation(int32 EventIndex)
+{
+}
+
+void UThorPattern::NotifyBeginPattern_BP_Implementation(int32 EventIndex, float TotalDuration)
+{
+}
+
+void UThorPattern::NotifyEndPattrern_BP_Implementation(int32 EventIndex)
+{
+}
+
+void UThorPattern::NotifyTickPattrern_BP_Implementation(int32 EventIndex, float FrameDeltaTime)
 {
 }
