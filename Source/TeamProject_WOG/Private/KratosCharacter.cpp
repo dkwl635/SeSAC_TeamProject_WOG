@@ -111,9 +111,6 @@ void AKratosCharacter::EquipAction(const FInputActionValue& inputValue)
 			AttackAction();
 		}
 		else {
-			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-			AnimInstance->Montage_Play(Equip_Axe_Montage);
-
 			Kratos_EquippedWeapon = true;
 		}
 	}
@@ -134,8 +131,8 @@ void AKratosCharacter::UnEquipAction(const FInputActionValue& inputValue)
 {
 	if ( Kratos_HasWeapon == true ) {
 		if ( Kratos_EquippedWeapon == true ) {
-			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-			AnimInstance->Montage_Play(UnEquip_Axe_Montage);
+			//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			//AnimInstance->Montage_Play(UnEquip_Axe_Montage);
 			Kratos_EquippedWeapon = false;
 		}
 	}

@@ -73,10 +73,15 @@ private:
 	void AttackAction();
 
 	UPROPERTY(EditAnywhere , Category = AnimMontage)
-	UAnimMontage* Equip_Axe_Montage;
+	UAnimMontage* Equip_Axe_Before_Montage;
+
+	UPROPERTY(EditAnywhere , Category = AnimMontage)
+	UAnimMontage* Equip_Axe_After_Montage;
 
 	UPROPERTY(EditAnywhere , Category = AnimMontage)
 	UAnimMontage* Attack_Axe_Montage;
+
+	bool Temp = true;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
