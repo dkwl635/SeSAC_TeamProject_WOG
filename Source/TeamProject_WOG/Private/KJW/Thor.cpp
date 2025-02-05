@@ -55,14 +55,34 @@ EWOG_Character_State AThor::GetCharacterState()
 	return EWOG_Character_State::NONE;
 }
 
-void AThor::TakeKDamage( const FWOG_DamageEvent& KDamageEvent)
+void AThor::TakeKDamage( const FWOG_DamageEvent& DamageEvent, ICombatInterface* DamageCauser)
 {
 	
+	float DamageValue = DamageEvent.DamageValue;
+
+	if ( GEngine )
+	{
+		GEngine->AddOnScreenDebugMessage(-1 , 5.0f , FColor::Red , FString::Printf(TEXT("Thor : Damage Value: %f") , DamageValue));
+	}
 }
 
 USkeletalMeshComponent* AThor::GetSkeletalMesh()
 {
 	return BodyComp;
+}
+
+void AThor::TestDamageEvnet(AActor* DamageTarget)
+{
+	ICombatInterface* Interface = Cast<ICombatInterface>(DamageTarget);
+	if ( Interface )
+	{
+		FWOG_DamageEvent DamageEvent;
+		DamageEvent.DamageValue = 10;
+		DamageEvent.StunValue = 10;
+		DamageEvent.HitPoint = DamageTarget->GetActorLocation();
+
+		Interface->TakeKDamage(DamageEvent , this);
+	}
 }
 
 void AThor::InitPatternClass()

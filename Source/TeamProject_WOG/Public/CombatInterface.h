@@ -50,7 +50,7 @@ public:
 	//현제 상태 리턴
 	virtual  EWOG_Character_State GetCharacterState() = 0;
 	//WOG 전용 데미지 주는 함수
-	virtual void TakeKDamage(const FWOG_DamageEvent& KDamageEvent) = 0;
+	virtual void TakeKDamage(const FWOG_DamageEvent& DamageEvent , ICombatInterface* DamageCauser) = 0;
 	//애니메이션을 강제로 시켜야할경우
 	virtual class USkeletalMeshComponent* GetSkeletalMesh() = 0;
 	//뭔가 조작이 필요할떄

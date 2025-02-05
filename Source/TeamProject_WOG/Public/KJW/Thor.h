@@ -52,9 +52,11 @@ public:
 //WOG 전투 관련 인터페이스
 public:
 	virtual EWOG_Character_State GetCharacterState() override;
-	virtual void TakeKDamage( const FWOG_DamageEvent& KDamageEvent) override;
+	virtual void TakeKDamage( const FWOG_DamageEvent& DamageEvent , ICombatInterface* DamageCauser) override;
 	virtual class USkeletalMeshComponent* GetSkeletalMesh() override;
 	virtual AActor* GetActor() override { return this; };
+
+	void TestDamageEvnet(AActor* DamageTarget);
 
 //토르 패턴 컨트롤
 private:
