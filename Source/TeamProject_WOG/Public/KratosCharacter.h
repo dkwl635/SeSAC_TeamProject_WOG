@@ -27,12 +27,22 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+// 0. Properties
+public:
+	// HP
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
+	float Health = 100.0f;
+
+	// 분노 게이지(Rage meter)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
+	float Rage = 100.0f;
+
 // 2. Camera
 public:
 	UPROPERTY( EditDefaultsOnly , Category = Camera)
 	class USpringArmComponent* springArmComp;
 
-	UPROPERTY(EditAnywhere, Category = Camera)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
 	class UCameraComponent* KratosCamComp;
 	
 // Camera Input
@@ -64,19 +74,27 @@ public:
 
 	void Move(const FInputActionValue& inputValue);
 
-// 4. Weapon & Attack Input
+// 4. 무기 장착
 private:
+	bool AimAttackState = false;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* IA_Weapon;
+	class UInputAction* IA_Aim;
 
-	void EquipAction(const FInputActionValue& inputValue);
-	void AttackAction();
+	void AimAxeAttack(const FInputActionValue& inputValue);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Return;
 
 	UPROPERTY(EditAnywhere , Category = AnimMontage)
-	UAnimMontage* Equip_Axe_Before_Montage;
+	UAnimMontage* Return_Axe_Montage;
 
+	void ReturnAxetoHand(const FInputActionValue& inputValue);
+
+private:
 	UPROPERTY(EditAnywhere , Category = AnimMontage)
-	UAnimMontage* Equip_Axe_After_Montage;
+	UAnimMontage* Equip_Axe_Montage;
+
 
 	UPROPERTY(EditAnywhere , Category = AnimMontage)
 	UAnimMontage* Attack_Axe_Montage;
@@ -85,9 +103,9 @@ private:
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	class UInputAction* IA_UnequipWeapon;
+	class UInputAction* IA_Sheath_UnSheath;
 
-	void UnEquipAction(const FInputActionValue& inputValue);
+	void SheathAction(const FInputActionValue& inputValue);
 
 	// Default Settings
 	UPROPERTY(EditDefaultsOnly, Category = PlayerSettings)
@@ -102,4 +120,10 @@ private:
 public:
 	UFUNCTION(BlueprintPure)
 	bool Get_KratosEquippedWeapon() const;
+
+//5. 공격
+	UPROPERTY(EditDefaultsOnly , Category = "Input")
+	class UInputAction* IA_Weapon;
+
+	void AttackAction(const FInputActionValue& inputValue);
 };

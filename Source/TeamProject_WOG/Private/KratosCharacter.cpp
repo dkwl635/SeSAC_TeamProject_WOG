@@ -7,6 +7,9 @@
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
 
+#include "CombatInterface.h"
+#include "TeamProject_WOG/TeamProject_WOG.h"
+
 // Sets default values
 AKratosCharacter::AKratosCharacter()
 {
@@ -76,8 +79,16 @@ void AKratosCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		PlayerInput->BindAction(IA_Move , ETriggerEvent::Triggered , this , &AKratosCharacter::Move);
 
 		// 2. 플레이어 공격 및 무기 장착
-		PlayerInput->BindAction(IA_Weapon, ETriggerEvent::Completed, this, &AKratosCharacter::EquipAction);
-		PlayerInput->BindAction(IA_UnequipWeapon , ETriggerEvent::Completed , this , &AKratosCharacter::UnEquipAction);
+		// 2-1. 플레이어 에임
+		PlayerInput->BindAction(IA_Aim , ETriggerEvent::Started , this , &AKratosCharacter::AimAxeAttack);
+		PlayerInput->BindAction(IA_Aim , ETriggerEvent::Completed, this , &AKratosCharacter::AimAxeAttack);
+
+		// 2-2. 무기 돌려받기(원거리)
+		PlayerInput->BindAction(IA_Return , ETriggerEvent::Completed , this , &AKratosCharacter::ReturnAxetoHand);
+
+		// 2-3. 플레이어 공격 및 무기 장착
+		PlayerInput->BindAction(IA_Weapon, ETriggerEvent::Completed, this, &AKratosCharacter::AttackAction);
+		PlayerInput->BindAction(IA_Sheath_UnSheath, ETriggerEvent::Started, this , &AKratosCharacter::SheathAction);
 	}
 
 }
@@ -103,14 +114,40 @@ void AKratosCharacter::Move(const FInputActionValue& inputValue)
 	Direction.Y = value.Y;
 }
 
+void AKratosCharacter::AimAxeAttack(const FInputActionValue& inputValue)
+{
+	if ( AimAttackState == false ) {
+		AimAttackState = true;
+	}
+	else {
+		AimAttackState = false;
+	}
+}
+
+void AKratosCharacter::ReturnAxetoHand(const FInputActionValue& inputValue)
+{
+	if ( Kratos_HasWeapon == false){
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_Play(Return_Axe_Montage);
+
+		Kratos_HasWeapon = true;
+	}
+}
+
 // 무기 장착
-void AKratosCharacter::EquipAction(const FInputActionValue& inputValue)
+void AKratosCharacter::SheathAction(const FInputActionValue& inputValue)
 {
 	if ( Kratos_HasWeapon == true ) {
 		if ( Kratos_EquippedWeapon == true ) {
-			AttackAction();
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			AnimInstance->Montage_Play(UnEquip_Axe_Montage);
+
+			Kratos_EquippedWeapon = false;
 		}
 		else {
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			AnimInstance->Montage_Play(Equip_Axe_Montage);
+
 			Kratos_EquippedWeapon = true;
 		}
 	}
@@ -119,29 +156,42 @@ void AKratosCharacter::EquipAction(const FInputActionValue& inputValue)
 	}
 }
 
-// 공격
-void AKratosCharacter::AttackAction()
-{
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(Attack_Axe_Montage);
-}
-
-// 무기 장착 해제
-void AKratosCharacter::UnEquipAction(const FInputActionValue& inputValue)
-{
-	if ( Kratos_HasWeapon == true ) {
-		if ( Kratos_EquippedWeapon == true ) {
-			//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-			//AnimInstance->Montage_Play(UnEquip_Axe_Montage);
-			Kratos_EquippedWeapon = false;
-		}
-	}
-}
-
 bool AKratosCharacter::Get_KratosEquippedWeapon() const
 {
 	return Kratos_EquippedWeapon;
 }
 
+
+
+// 공격
+void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
+{
+	//무기가 있다.
+	if ( Kratos_HasWeapon == true ) {
+
+		//무기를 손에 들고 있다.
+		if ( Kratos_EquippedWeapon == true ) {
+			// 원거리 공격
+			if ( AimAttackState == true ) {
+				UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+				AnimInstance->Montage_Play(Attack_Axe_Montage);
+
+				// 무기는 없다.(날아갔으므로)
+				Kratos_HasWeapon = false;
+				
+				// 조준 상태에서 벗어난다.
+				AimAttackState = false;
+			}
+			// 근거리 공격
+			else {
+
+			}
+		}
+		// 주먹 공격을 한다.
+		else {
+
+		}
+	}
+}
 
 
