@@ -10,16 +10,15 @@ void UThor_ATTACK_THUNDER_CLAP::StartPattern_CBP()
 
 	bAttack = false;
 	float TargetDistance = Owner->GetDistanceTo(Owner->Target);
-	if ( TargetDistance < AttackRadius - 200 )
+	if ( TargetDistance < AttackRadius )
 	{
 		Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
 		bAttack = true;
 	}
 	else
 	{
-		Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Play(DashAnimMontage);
+		Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Play(DashAnimMontage , 0.1f);
 	}
-	
 	
 }
 
@@ -55,5 +54,25 @@ void UThor_ATTACK_THUNDER_CLAP::NotifyTickPattrern_C(int32 EventIndex , float Fr
 	float TargetDistance = TargetDirection.Size();
 	TargetDirection.Normalize();
 	FRotator rot = TargetDirection.Rotation();
-	Owner->SetActorRotation(rot);
+	if ( bAttack )
+	{
+		Owner->SetActorRotation(rot);
+	}
+	else
+	{
+		if ( TargetDistance < AttackRadius)
+		{
+			Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Stop(0.2f);
+			Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+			bAttack = true;
+		}
+		else
+		{
+			FVector p = OwnerLocation + TargetDirection * FrameDeltaTime * DashSpeed;
+			Owner->SetActorLocationAndRotation(p , rot);
+
+		}
+	}
+
+	
 }
