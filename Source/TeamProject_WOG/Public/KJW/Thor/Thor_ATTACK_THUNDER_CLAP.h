@@ -4,45 +4,40 @@
 
 #include "CoreMinimal.h"
 #include "KJW/ThorPattern.h"
-#include "Thor_ATTACK_TRIPLE_STRIKE_COMBO.generated.h"
+#include "Thor_ATTACK_THUNDER_CLAP.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TEAMPROJECT_WOG_API UThor_ATTACK_TRIPLE_STRIKE_COMBO : public UThorPattern
+class TEAMPROJECT_WOG_API UThor_ATTACK_THUNDER_CLAP : public UThorPattern
 {
 	GENERATED_BODY()
 	
+
 protected:
-	virtual void EndPattern_CBP() override;
 	virtual void StartPattern_CBP() override;
 protected:
 	virtual void NotifyEventPattern_C(int32 EventIndex) override;
 	virtual  void NotifyTickPattrern_C(int32 EventIndex , float FrameDeltaTime) override;
 
+
 public:
-	//공격 모션 몽타주
+	//박수 모션 몽타주
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* AnimMontage;
-	//달리기 모션 몽타주
+
+	//대쉬 모션 몽타주
 	UPROPERTY(EditAnywhere)
-	UAnimMontage* RunAnimMontage;
+	UAnimMontage* DashAnimMontage;
 
-	int32 AttackCount = 0;
 	UPROPERTY(EditAnywhere)
-	TArray<float> Walk_speed;
-
-
+	float AttackRadius = 200.f;
 	UPROPERTY(EditAnywhere)
 	float Damage = 10.0f;
-
+	
 	UPROPERTY(EditAnywhere)
-	float AttackDistance = 300.0f;
-	UPROPERTY(EditAnywhere)
-	float RunSpeed = 700.0f;
-
+	float DashSpeed = 1300.0f;
+	
 	bool bAttack = false;
-
-
 };

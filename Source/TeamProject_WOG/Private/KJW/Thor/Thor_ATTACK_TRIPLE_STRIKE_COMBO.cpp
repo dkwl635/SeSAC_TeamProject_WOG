@@ -4,22 +4,29 @@
 #include "KJW/Thor/Thor_ATTACK_TRIPLE_STRIKE_COMBO.h"
 
 
-void UThor_ATTACK_TRIPLE_STRIKE_COMBO::StartPattern_C()
+void UThor_ATTACK_TRIPLE_STRIKE_COMBO::EndPattern_CBP()
 {
+	UE_LOG(LogTemp , Warning , TEXT("UThor_ATTACK_TRIPLE_STRIKE_COMBO_Attack_EndPattern_CBP"));
+	
+	Super::EndPattern_CBP();
+}
+
+void UThor_ATTACK_TRIPLE_STRIKE_COMBO::StartPattern_CBP()
+{
+	Super::StartPattern_CBP();
 	UE_LOG(LogTemp, Warning, TEXT("Attack_StartPattern_C"));
-
-	Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
-}
-
-void UThor_ATTACK_TRIPLE_STRIKE_COMBO::StopPattern_C()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Attack_StopPattern_C"));
-}
-
-void UThor_ATTACK_TRIPLE_STRIKE_COMBO::EndPattern_C()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Attack_EndPattern_C"));
-	Owner->StartPattarn(EThorPattern::MOVE);
+	AttackCount = 0;
+	bAttack = false;
+	 float TargetDistance = Owner->GetDistanceTo(Owner->Target);
+	 if ( TargetDistance < AttackDistance )
+	 {
+		 Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+		 bAttack = true;
+	 }
+	 else
+	 {
+		 Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Play(RunAnimMontage);
+	 }
 }
 
 void UThor_ATTACK_TRIPLE_STRIKE_COMBO::NotifyEventPattern_C(int32 EventIndex)
@@ -52,20 +59,47 @@ void UThor_ATTACK_TRIPLE_STRIKE_COMBO::NotifyEventPattern_C(int32 EventIndex)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("충돌한 액터: %s"), *OutHit.GetActor()->GetName());
 	}
+	
+	AttackCount++;
 }
 
 void UThor_ATTACK_TRIPLE_STRIKE_COMBO::NotifyTickPattrern_C(int32 EventIndex, float FrameDeltaTime)
 {
-	//순간적으로 따라가게
-	if (Owner && Owner->Target)
+	FVector OwnerLocation = Owner->GetActorLocation();
+	FVector TargetDirection = Owner->Target->GetActorLocation() - OwnerLocation;
+	TargetDirection.Z = 0;
+
+	float TargetDistance = TargetDirection.Size();
+	TargetDirection.Normalize();
+	FRotator rot = TargetDirection.Rotation();
+	if ( !bAttack )
 	{
-		FVector Dir = Owner->Target->GetActorLocation() - Owner->GetActorLocation();
-		Dir.Normalize();
-
-		FRotator rot = Dir.Rotation();
-		Owner->SetActorRotation(rot);
-		Owner->SetActorLocation(Owner->GetActorLocation() + (Dir * Walk_speed * FrameDeltaTime));
-
+		
+		UE_LOG(LogTemp , Warning , TEXT("TargetDistance: %f") , TargetDistance);
+		if ( TargetDistance < AttackDistance )
+		{
+			Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Stop(0.2f);
+			Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
+			bAttack = true;
+		}
+		else
+		{		
+			FVector p = OwnerLocation + TargetDirection * FrameDeltaTime * RunSpeed;
+			Owner->SetActorLocationAndRotation(p , rot);
+			
+		}
+	}
+	else
+	{
+		if ( TargetDistance < 100 )
+		{
+			Owner->SetActorRotation(rot);
+		}
+		else
+		{
+			FVector p = OwnerLocation + TargetDirection * Walk_speed[AttackCount] * FrameDeltaTime;
+			Owner->SetActorLocationAndRotation(p , rot);
+		}
 	}
 
 }

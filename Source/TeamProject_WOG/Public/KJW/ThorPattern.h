@@ -34,6 +34,18 @@ public:
     void NotifyTickPattrern(int32 EventIndex, float FrameDeltaTime);
 
 protected:
+    //셋팅이 다끝나고 최종 시작 함수
+    virtual void StartPattern_CBP(); 
+    //C,BP 관련 스탑시 최종 스탑 함수
+    virtual void StopPattern_CBP();
+   
+    //C,BP 관련 종료시 최종 종료 함수
+    //상속할시 마지막에 호출시켜 주시요
+    virtual void EndPattern_CBP();
+
+    //C,BP Tick 끝나고 함수
+    virtual void TickPattern_CBP();
+protected:
     //FUNCTION -> C++ -> Blueprint
     virtual void StartPattern_C();
     virtual void StopPattern_C();
@@ -80,5 +92,13 @@ private:
      void NotifyBeginPattern_BP_Implementation(int32 EventIndex , float TotalDuration);
      void NotifyEndPattrern_BP_Implementation(int32 EventIndex);
      void NotifyTickPattrern_BP_Implementation(int32 EventIndex, float FrameDeltaTime);
+
+protected:
+    UPROPERTY(EditAnywhere)
+    bool bHitable = false;
+
+public:
+    bool IsHitable() { return bHitable; }
+
 };
 

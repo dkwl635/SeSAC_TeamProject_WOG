@@ -18,11 +18,11 @@ namespace EKCollisionProfileName
 	static const FName EnemyAttack = FName("EnemyAttack");
 }
 
-enum class ETraceChannel : uint8
+namespace EWOGTraceChannel
 {
-	PlayerAttackTrace = ECC_GameTraceChannel5 ,
-	EnemyAttackTrace = ECC_GameTraceChannel6
-};
+    static const ECollisionChannel PlayerAttackTrace = ECollisionChannel::ECC_GameTraceChannel5;
+    static const ECollisionChannel EnemyAttackTrace = ECollisionChannel::ECC_GameTraceChannel6;
+}
 
 
 UENUM(BlueprintType)

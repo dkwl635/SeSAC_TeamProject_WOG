@@ -35,5 +35,7 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	float WalkSpeed = 300.0f;
+
 	
+
 };

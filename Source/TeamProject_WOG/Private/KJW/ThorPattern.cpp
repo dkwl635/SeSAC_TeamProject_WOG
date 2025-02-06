@@ -15,6 +15,7 @@ void UThorPattern::StartPattern()
 {
 	StartPattern_C();
 	StartPattern_BP();
+	StartPattern_CBP();
 	
 }
 
@@ -22,12 +23,14 @@ void UThorPattern::StopPattern()
 {
 	StopPattern_C();
 	StopPattern_BP();
+	StopPattern_CBP();
 }
 
 void UThorPattern::EndPattern()
 {
 	EndPattern_C();
 	EndPattern_BP();
+	EndPattern_CBP();
 }
 
 void UThorPattern::TickPattern()
@@ -39,6 +42,7 @@ void UThorPattern::TickPattern()
 	}
 
 	TickPattern_BP();
+	TickPattern_CBP();
 }
 
 void UThorPattern::NotifyEventPattern(int32 EventIndex)
@@ -64,6 +68,24 @@ void UThorPattern::NotifyTickPattrern(int32 EventIndex , float FrameDeltaTime)
 {
 	NotifyTickPattrern_C(EventIndex, FrameDeltaTime);
 	NotifyTickPattrern_BP(EventIndex,  FrameDeltaTime);
+}
+
+void UThorPattern::StartPattern_CBP()
+{
+}
+
+void UThorPattern::StopPattern_CBP()
+{
+}
+
+void UThorPattern::EndPattern_CBP()
+{
+	//End Pattern CBP
+	Owner->StartPattarn(EThorPattern::MOVE);
+}
+
+void UThorPattern::TickPattern_CBP()
+{
 }
 
 void UThorPattern::StartPattern_C()
