@@ -81,7 +81,7 @@ void UThorPattern::StopPattern_CBP()
 void UThorPattern::EndPattern_CBP()
 {
 	//End Pattern CBP
-	Owner->StartPattarn(EThorPattern::MOVE);
+	Owner->StartPattarn(EThorPattern::IDLE);
 }
 
 void UThorPattern::TickPattern_CBP()
@@ -152,3 +152,8 @@ void UThorPattern::NotifyEndPattrern_BP_Implementation(int32 EventIndex)
 void UThorPattern::NotifyTickPattrern_BP_Implementation(int32 EventIndex, float FrameDeltaTime)
 {
 }
+
+void UThorPattern::SetOptionValue(float Value_1, float Value_2, float Value_3)
+{
+}
+

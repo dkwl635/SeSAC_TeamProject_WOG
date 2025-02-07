@@ -42,7 +42,6 @@ protected:
     //C,BP 관련 종료시 최종 종료 함수
     //상속할시 마지막에 호출시켜 주시요
     virtual void EndPattern_CBP();
-
     //C,BP Tick 끝나고 함수
     virtual void TickPattern_CBP();
 protected:
@@ -99,6 +98,10 @@ protected:
 
 public:
     bool IsHitable() { return bHitable; }
+
+public:
+    //특수한 값을 줄때 사용할 함수
+    virtual void SetOptionValue(float Value_1 = 0, float Value_2 = 0, float Value_3 = 0);
 
 };
 

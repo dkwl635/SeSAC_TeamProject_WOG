@@ -14,6 +14,15 @@ class TEAMPROJECT_WOG_API UThor_Idle : public UThorPattern
 {
 	GENERATED_BODY()
 	
+
+protected:
+	virtual void StartPattern_CBP() override;
+	virtual void TickPattern_CBP() override;
+protected:
+	void SetNextPattern();
+
 public:
+	float IdleTime;
+
 
 };

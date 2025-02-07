@@ -93,6 +93,15 @@ void AThor::TestDamageEvnet(AActor* DamageTarget)
 
 void AThor::InitPatternClass()
 {
+	if (!IdlePatternClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("No IdlePatternClass"));
+	}
+
+	UThorPattern* ThorIdlePattern = NewObject<UThorPattern>(this, IdlePatternClass);
+	ThorIdlePattern->InitPattern(this);
+	Patterns.Add(EThorPattern::IDLE, ThorIdlePattern);
+
 	//PatternClass 생성후 TMap 넣기
 	for ( int32 i = 0; i < PatternClass.Num(); i++ )
 	{
@@ -112,7 +121,7 @@ void AThor::InitPatternClass()
 		}
 	}
 
-	StartPattarn(EThorPattern::MOVE);
+	StartPattarn(EThorPattern::IDLE);
 }
 
 
@@ -213,6 +222,12 @@ FVector AThor::GetMoveRandomPos(FVector SpawnPos , float MapSize , float Dist)
 	
 	return Result;
 
+}
+
+void AThor::SetIdleTimer(float IdleTimer)
+{
+	GetPattern(EThorPattern::IDLE)->SetOptionValue(IdleTimer);
+	
 }
 
 

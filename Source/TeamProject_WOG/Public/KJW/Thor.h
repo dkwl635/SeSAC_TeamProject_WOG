@@ -42,7 +42,6 @@ private:
 	UPROPERTY()
 	class UThorAnimInstance* ThorAnimIns;
 public:
-	
 	void SetIsMove(bool Isbool);
 
 //크레토스가 들어갈 공간	
@@ -62,6 +61,9 @@ public:
 //토르 패턴 컨트롤
 
 public:
+	//Idle 상태는 필수로 가져가기 위해서
+	UPROPERTY(EditAnywhere , Category = PatternClass)
+	TSubclassOf<class UThor_Idle> IdlePatternClass;
 	UPROPERTY(EditAnywhere , Category = PatternClass)
 	TArray<TSubclassOf<class UThorPattern>> PatternClass;
 	void InitPatternClass();
@@ -80,11 +82,9 @@ private:
 	class UThorPattern* CurPattern;
 	UPROPERTY()
 	TMap<EThorPattern , class UThorPattern*> Patterns;
-
 	class UThorPattern* GetPattern(EThorPattern Pattern);
-
-
-
+	
+//애님 노티파이 블루프린트에서 호출하는
 	UFUNCTION(BlueprintCallable)
 	void NotifyEventPattern(int32 EventIndex);
 	UFUNCTION(BlueprintCallable)
@@ -94,13 +94,20 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void NotifyTickPattrern(int32 EventIndex, float FrameDeltaTime);
 
+	
 public:
+	//몽타주 종료시
 	UFUNCTION()
 	void OnMontageEnded(UAnimMontage* Montage , bool bInterrupted);
 
 	
 public:
+	//맵 사이즈에서 랜덤 위치 리턴
 	FVector GetMoveRandomPos(FVector SpawnPos , float MapSize , float Dist);
 	
-	
+
+public:
+	//특수한 패턴종료시 Idle 상태 유지를 위한 
+	void SetIdleTimer(float IdleTimer);
+
 };

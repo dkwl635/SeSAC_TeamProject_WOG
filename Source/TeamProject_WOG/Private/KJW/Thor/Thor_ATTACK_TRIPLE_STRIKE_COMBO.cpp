@@ -7,7 +7,7 @@
 void UThor_ATTACK_TRIPLE_STRIKE_COMBO::EndPattern_CBP()
 {
 	UE_LOG(LogTemp , Warning , TEXT("UThor_ATTACK_TRIPLE_STRIKE_COMBO_Attack_EndPattern_CBP"));
-	
+	Owner->SetIdleTimer(4.0f);
 	Super::EndPattern_CBP();
 }
 
