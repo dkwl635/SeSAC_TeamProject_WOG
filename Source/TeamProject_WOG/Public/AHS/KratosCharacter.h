@@ -5,10 +5,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputActionValue.h"
+
+#include "CombatInterface.h"
+
+#include "TeamProject_WOG/TeamProject_WOG.h"
+
 #include "KratosCharacter.generated.h"
 
 UCLASS()
-class TEAMPROJECT_WOG_API AKratosCharacter : public ACharacter
+class TEAMPROJECT_WOG_API AKratosCharacter : public ACharacter, public ICombatInterface
 {
 	GENERATED_BODY()
 
@@ -122,8 +127,23 @@ public:
 	bool Get_KratosEquippedWeapon() const;
 
 //5. 공격
+	//도끼 원거리 공격
 	UPROPERTY(EditDefaultsOnly , Category = "Input")
 	class UInputAction* IA_Weapon;
 
 	void AttackAction(const FInputActionValue& inputValue);
+
+	// 도끼 근접 공격
+	UPROPERTY(EditAnywhere, Category = AnimMontage)
+	UAnimMontage* Melee_Attack_Montage;
+
+	// 근접 공격(주먹)
+	UPROPERTY(EditAnywhere, Category = AnimMontage)
+	UAnimMontage* Fist_Attack_Montage;
+
+	// ICombatInterface을(를) 통해 상속됨
+	void SetCharacterState(EWOG_Character_State NewState) override;
+	void TakeKDamage(const FWOG_DamageEvent& DamageEvent , ICombatInterface* DamageCauser) override;
+	USkeletalMeshComponent* GetSkeletalMesh() override;
+	AActor* GetActor() override;
 };

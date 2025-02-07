@@ -7,8 +7,6 @@
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
 
-#include "CombatInterface.h"
-#include "TeamProject_WOG/TeamProject_WOG.h"
 
 // Sets default values
 AKratosCharacter::AKratosCharacter()
@@ -49,12 +47,19 @@ void AKratosCharacter::BeginPlay()
 			subsystem->AddMappingContext(IMC_Kratos , 0);
 		}
 	}
+
+
 }
 
 // Called every frame
 void AKratosCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// 컨트롤러 비활성화
+	if ( CharacterState == EWOG_Character_State::STUN) {
+		return;
+	}
 
 	// 크레토스 이동
 	Direction = FTransform(GetControlRotation()).TransformVector(Direction);
@@ -184,14 +189,35 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 			}
 			// 근거리 공격
 			else {
-
+				UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+				AnimInstance->Montage_Play(Melee_Attack_Montage);
 			}
 		}
 		// 주먹 공격을 한다.
 		else {
-
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			AnimInstance->Montage_Play(Fist_Attack_Montage);
 		}
 	}
+}
+
+void AKratosCharacter::SetCharacterState(EWOG_Character_State NewState)
+{
+	CharacterState = NewState;
+}
+
+void AKratosCharacter::TakeKDamage(const FWOG_DamageEvent& DamageEvent , ICombatInterface* DamageCauser)
+{
+}
+
+USkeletalMeshComponent* AKratosCharacter::GetSkeletalMesh()
+{
+	return GetSkeletalMesh();
+}
+
+AActor* AKratosCharacter::GetActor()
+{
+	return this;
 }
 
 
