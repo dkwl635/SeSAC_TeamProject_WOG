@@ -38,6 +38,7 @@ void AThor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
 	if ( CurPattern )
 	{
 		CurPattern->TickPattern();
