@@ -201,11 +201,13 @@ void AThor::OnMontageEnded(UAnimMontage* Montage , bool bInterrupted)
 	{
 		if ( Montage->bLoop ) { return; }
 		UE_LOG(LogTemp , Warning , TEXT("몽타주가 강제 종료됨!"));
-		CurPattern->StopPattern();
+		//CurPattern->StopPattern();
 	}
 	else
 	{
 		UE_LOG(LogTemp , Log , TEXT("몽타주가 정상적으로 끝남!"));
+		if ( !CurPattern->IsEndPattern() ) { return; }
+
 		EndPattarn(CurPattern->ThorPattern);
 	}
 }

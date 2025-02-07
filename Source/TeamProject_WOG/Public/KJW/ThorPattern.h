@@ -96,12 +96,18 @@ protected:
     UPROPERTY(EditAnywhere)
     bool bHitable = false;
 
+    bool bEndPattern = true;
+
 public:
     bool IsHitable() { return bHitable; }
+    bool IsEndPattern() { return bEndPattern; }
 
 public:
     //특수한 값을 줄때 사용할 함수
     virtual void SetOptionValue(float Value_1 = 0, float Value_2 = 0, float Value_3 = 0);
 
+protected :
+    FVector MapPoint = FVector::ZeroVector;
+    float MapSize = 1000.0f;
 };
 

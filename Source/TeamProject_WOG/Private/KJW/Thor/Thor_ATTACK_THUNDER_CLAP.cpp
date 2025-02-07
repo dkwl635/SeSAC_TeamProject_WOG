@@ -10,7 +10,7 @@ void UThor_ATTACK_THUNDER_CLAP::StartPattern_CBP()
 
 	bAttack = false;
 	float TargetDistance = Owner->GetDistanceTo(Owner->Target);
-	if ( TargetDistance < AttackRadius )
+	if ( TargetDistance < AttackRadius * 2.0f)
 	{
 		Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
 		bAttack = true;
