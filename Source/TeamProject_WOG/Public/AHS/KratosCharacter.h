@@ -42,6 +42,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
 	float Rage = 100.0f;
 
+	// 상태 관리(FSM)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
+	class UKratosFSM* fsm;
+
 // 2. Camera
 public:
 	UPROPERTY( EditDefaultsOnly , Category = Camera)
@@ -126,13 +130,30 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool Get_KratosEquippedWeapon() const;
 
-//5. 공격
+//5. 공격 
+public:
 	//도끼 원거리 공격
 	UPROPERTY(EditDefaultsOnly , Category = "Input")
-	class UInputAction* IA_Weapon;
+	class UInputAction* IA_Attack;
 
 	void AttackAction(const FInputActionValue& inputValue);
 
+	// 도끼 스폰
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontage)
+	class UArrowComponent* AxeSpawnPoint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class ALeviathanAxe> SpawnedAxe;
+
+	// 도끼 Aim UI 위젯
+	UPROPERTY(EditDefaultsOnly, Category = AimAxeUI)
+	TSubclassOf<class UUserWidget> AimAxeUIFactory;
+
+	// 도끼 Aim UI 위젯 인스턴스
+	UPROPERTY()
+	class UUserWidget* AimAxeUI;
+
+	//-------------------------------------------------------------------
 	// 도끼 근접 공격
 	UPROPERTY(EditAnywhere, Category = AnimMontage)
 	UAnimMontage* Melee_Attack_Montage;

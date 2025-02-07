@@ -6,6 +6,11 @@
 #include "Camera/CameraComponent.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
+#include "Components/ArrowComponent.h"
+#include "AHS/LeviathanAxe.h"
+#include "Blueprint/UserWidget.h"
+#include "KratosFSM.h"
+
 
 
 // Sets default values
@@ -32,6 +37,11 @@ AKratosCharacter::AKratosCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
+
+	//2. 원거리 도끼 Spawn Point
+	AxeSpawnPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("AxeSpawnPoint"));
+	AxeSpawnPoint->SetupAttachment(RootComponent);
+
 }
 
 // Called when the game starts or when spawned
@@ -39,6 +49,7 @@ void AKratosCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	//1. 컨트롤 연결
 	auto pc = Cast<APlayerController>(Controller);
 	if ( pc ) {
 		auto subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
@@ -48,6 +59,11 @@ void AKratosCharacter::BeginPlay()
 		}
 	}
 
+	//2. Aim UI
+	AimAxeUI = CreateWidget(GetWorld(), AimAxeUIFactory);
+
+	//3. FSM 추가
+	//fsm = CreateDefaultSubobject<UKratosFSM>(TEXT("FSM"));
 
 }
 
@@ -89,10 +105,10 @@ void AKratosCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		PlayerInput->BindAction(IA_Aim , ETriggerEvent::Completed, this , &AKratosCharacter::AimAxeAttack);
 
 		// 2-2. 무기 돌려받기(원거리)
-		PlayerInput->BindAction(IA_Return , ETriggerEvent::Completed , this , &AKratosCharacter::ReturnAxetoHand);
+		PlayerInput->BindAction(IA_Return , ETriggerEvent::Started , this , &AKratosCharacter::ReturnAxetoHand);
 
 		// 2-3. 플레이어 공격 및 무기 장착
-		PlayerInput->BindAction(IA_Weapon, ETriggerEvent::Completed, this, &AKratosCharacter::AttackAction);
+		PlayerInput->BindAction(IA_Attack, ETriggerEvent::Started, this, &AKratosCharacter::AttackAction);
 		PlayerInput->BindAction(IA_Sheath_UnSheath, ETriggerEvent::Started, this , &AKratosCharacter::SheathAction);
 	}
 
@@ -119,13 +135,38 @@ void AKratosCharacter::Move(const FInputActionValue& inputValue)
 	Direction.Y = value.Y;
 }
 
+// Aim
 void AKratosCharacter::AimAxeAttack(const FInputActionValue& inputValue)
 {
-	if ( AimAttackState == false ) {
-		AimAttackState = true;
+	if ( Kratos_EquippedWeapon && Kratos_HasWeapon) {
+		if ( AimAttackState == false ) {
+			//Aim UI 활성화
+			AimAxeUI->AddToViewport();
+
+			//카메라 Zoom in
+			KratosCamComp->SetFieldOfView(45.0f);
+
+			AimAttackState = true;
+			GEngine->AddOnScreenDebugMessage(-1 , 2.0f , FColor::Red , TEXT("Aiming"));
+		}
+		else {
+			//Aim UI 비활성화
+			AimAxeUI->RemoveFromParent();
+
+			//카메라 원상태 복귀
+			KratosCamComp->SetFieldOfView(90.0f);
+
+			AimAttackState = false;
+
+			GEngine->AddOnScreenDebugMessage(-1 , 2.0f , FColor::Red , TEXT("Aim Canceled"));
+		}
 	}
 	else {
-		AimAttackState = false;
+		//Aim UI 비활성화
+		AimAxeUI->RemoveFromParent();
+
+		//카메라 원상태 복귀
+		KratosCamComp->SetFieldOfView(90.0f);
 	}
 }
 
@@ -161,6 +202,7 @@ void AKratosCharacter::SheathAction(const FInputActionValue& inputValue)
 	}
 }
 
+// 무기 장착 상태 판단
 bool AKratosCharacter::Get_KratosEquippedWeapon() const
 {
 	return Kratos_EquippedWeapon;
@@ -185,7 +227,29 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 				Kratos_HasWeapon = false;
 				
 				// 조준 상태에서 벗어난다.
-				AimAttackState = false;
+				AimAttackState = true;
+
+				// 생성되어 날라가기
+
+				// LineTrace로, 바라보는 방향의 위치까지 날아가기
+				FVector startPos = KratosCamComp->GetComponentLocation();
+				FVector endPos = KratosCamComp->GetComponentLocation() + KratosCamComp->GetForwardVector() * 5000.0f;	//5km(5000cm)
+				FHitResult hitInfo;
+				FCollisionQueryParams params;
+				params.AddIgnoredActor(this);
+				bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, startPos, endPos, 
+																ECollisionChannel::ECC_Visibility, params);
+				if ( bHit == true ) {
+					FTransform t = AxeSpawnPoint->GetComponentTransform();
+					GetWorld()->SpawnActor<ALeviathanAxe>(SpawnedAxe, t);
+
+					
+
+
+				}
+
+				
+
 			}
 			// 근거리 공격
 			else {
@@ -198,6 +262,10 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			AnimInstance->Montage_Play(Fist_Attack_Montage);
 		}
+	}
+	else {
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_Play(Fist_Attack_Montage);
 	}
 }
 
