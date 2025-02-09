@@ -176,6 +176,8 @@ void AKratosCharacter::ReturnAxetoHand(const FInputActionValue& inputValue)
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_Play(Return_Axe_Montage);
 
+		RecallAxe();
+
 		Kratos_HasWeapon = true;
 	}
 }
@@ -208,8 +210,6 @@ bool AKratosCharacter::Get_KratosEquippedWeapon() const
 	return Kratos_EquippedWeapon;
 }
 
-
-
 // 공격
 void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 {
@@ -225,30 +225,33 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 
 				// 무기는 없다.(날아갔으므로)
 				Kratos_HasWeapon = false;
-				
+
 				// 조준 상태에서 벗어난다.
 				AimAttackState = true;
 
 				// 생성되어 날라가기
+				ThrowAxe();
 
+				/*
 				// LineTrace로, 바라보는 방향의 위치까지 날아가기
 				FVector startPos = KratosCamComp->GetComponentLocation();
 				FVector endPos = KratosCamComp->GetComponentLocation() + KratosCamComp->GetForwardVector() * 5000.0f;	//5km(5000cm)
 				FHitResult hitInfo;
 				FCollisionQueryParams params;
 				params.AddIgnoredActor(this);
-				bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, startPos, endPos, 
+				bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, startPos, endPos,
 																ECollisionChannel::ECC_Visibility, params);
 				if ( bHit == true ) {
 					FTransform t = AxeSpawnPoint->GetComponentTransform();
 					GetWorld()->SpawnActor<ALeviathanAxe>(SpawnedAxe, t);
 
-					
+
 
 
 				}
+				*/
 
-				
+
 
 			}
 			// 근거리 공격
@@ -269,6 +272,56 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 	}
 }
 
+
+FVector AKratosCharacter::GetAimLocation()
+{
+	FVector StartPos = KratosCamComp->GetComponentLocation();
+	FVector EndPos = StartPos + KratosCamComp->GetForwardVector() * 5000.0f; // 50m 범위
+
+	FHitResult HitInfo;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitInfo , StartPos , EndPos , ECC_Visibility , Params);
+
+	return bHit ? HitInfo.ImpactPoint : EndPos;
+}
+
+void AKratosCharacter::ThrowAxe()
+{
+	if ( AxeActor == nullptr )
+	{
+		// ✅ 소켓이 존재하는지 확인 후 가져오기
+		FVector SpawnLocation = FVector::ZeroVector;
+		if ( GetMesh() && GetMesh()->DoesSocketExist("Armmed") )
+		{
+			SpawnLocation = GetMesh()->GetSocketLocation("Armmed");
+		}
+		else
+		{
+			UE_LOG(LogTemp , Warning , TEXT("소켓 'Armmed'를 찾을 수 없습니다! 기본 위치로 설정."));
+		}
+
+		FRotator SpawnRotation = GetControlRotation();
+		AxeActor = GetWorld()->SpawnActor<ALeviathanAxe>(AxeClass , SpawnLocation , SpawnRotation);
+	}
+
+	FVector TargetLocation = GetAimLocation(); // 에임한 위치
+	AxeActor->ThrowAxe(TargetLocation);
+}
+
+
+void AKratosCharacter::RecallAxe()
+{
+	if ( AxeActor )
+	{
+		FVector HandLocation = GetMesh()->GetSocketLocation("Armmed");
+		AxeActor->ReturnAxe(HandLocation);
+		AxeActor = nullptr;
+	}
+}
+
+//--------------------------------------------------------------------------------------
 void AKratosCharacter::SetCharacterState(EWOG_Character_State NewState)
 {
 	CharacterState = NewState;

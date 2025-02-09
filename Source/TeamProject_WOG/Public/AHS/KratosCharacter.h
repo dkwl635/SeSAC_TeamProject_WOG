@@ -84,7 +84,7 @@ public:
 	void Move(const FInputActionValue& inputValue);
 
 // 4. 무기 장착
-private:
+public:
 	bool AimAttackState = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -132,6 +132,14 @@ public:
 
 //5. 공격 
 public:
+	// 소환된 도끼
+	class ALeviathanAxe* AxeActor;
+
+	 // 도끼의 스폰 클래스
+    UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+    TSubclassOf<ALeviathanAxe> AxeClass;
+
+
 	//도끼 원거리 공격
 	UPROPERTY(EditDefaultsOnly , Category = "Input")
 	class UInputAction* IA_Attack;
@@ -152,6 +160,15 @@ public:
 	// 도끼 Aim UI 위젯 인스턴스
 	UPROPERTY()
 	class UUserWidget* AimAxeUI;
+
+	// 바라보는 방향 위치
+	FVector GetAimLocation();
+
+	//도끼 던지기
+	void ThrowAxe();
+
+	//도끼 불러오기
+	void RecallAxe();
 
 	//-------------------------------------------------------------------
 	// 도끼 근접 공격
