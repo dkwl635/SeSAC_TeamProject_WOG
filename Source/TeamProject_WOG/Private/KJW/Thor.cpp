@@ -5,6 +5,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "KJW/ThorAnimInstance.h"
 #include "KJW/ThorPattern.h"
+#include "KJW/Thor/Thor_Idle.h"
 
 // Sets default values
 AThor::AThor()
@@ -14,10 +15,13 @@ AThor::AThor()
 
 	BodyCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("BodyCollision"));
 	BodyComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BodyComp"));
+	HammerComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HammerComp"));
 
 	SetRootComponent(BodyCollision);
 	BodyComp->SetupAttachment(GetRootComponent());
-
+	HammerComp->SetupAttachment(BodyComp, TEXT("hand_r"));
+	HammerComp->SetRelativeScale3D(FVector(0.04f));
+	HammerComp->SetRelativeLocation(FVector( -0.4f , 0.0f , -0.8f ));
 }
 
 // Called when the game starts or when spawned
@@ -231,6 +235,13 @@ void AThor::SetIdleTimer(float IdleTimer)
 {
 	GetPattern(EThorPattern::IDLE)->SetOptionValue(IdleTimer);
 	
+}
+
+void AThor::ShowHammer(bool bShow)
+{
+	IsHammer = bShow;
+	
+	HammerComp->SetVisibility(bShow);
 }
 
 

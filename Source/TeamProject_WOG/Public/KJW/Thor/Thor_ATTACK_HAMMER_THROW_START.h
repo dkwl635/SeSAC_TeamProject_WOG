@@ -29,16 +29,23 @@ public:
 	UPROPERTY(EditAnywhere)
 	float AttackRange = 500.f;
 
-	//0-백대쉬  
-	//1-킥
-	//2-망치 던지기
+	//0-망치 던지기
+	//1-백대쉬  
+	//2-킥
 	int32 ParrtenIndex = 0;
 	FVector StartPos = FVector::ZeroVector;
 	FVector MovePos = FVector::ZeroVector;
 
 	float DashTimer = 0;
 	float DashDuringTimer = 0;
+
+public:
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AThorHammer> ThorHammerClass;
+	class AThorHammer* ThorHammer;
+
 protected:
+	virtual void InitPattern(class AThor* Thor) override;
 	virtual void StartPattern_C() override;
 	virtual void StartPattern_CBP() override;
 

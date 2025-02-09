@@ -2,6 +2,18 @@
 
 
 #include "KJW/Thor/Thor_ATTACK_HAMMER_THROW_START.h"
+#include "KJW/ThorHammer.h"
+
+void UThor_ATTACK_HAMMER_THROW_START::InitPattern(AThor* Thor)
+{
+	Super::InitPattern(Thor);
+
+	if ( ThorHammerClass )
+	{
+		ThorHammer =Owner->GetWorld()->SpawnActor<AThorHammer>(ThorHammerClass);
+		ThorHammer->SetActorLocation(FVector(1000));
+	}
+}
 
 void UThor_ATTACK_HAMMER_THROW_START::StartPattern_C()
 {
@@ -134,7 +146,14 @@ void UThor_ATTACK_HAMMER_THROW_START::NotifyTickPattrern_C(int32 EventIndex, flo
 
 void UThor_ATTACK_HAMMER_THROW_START::NotifyEventPattern_C(int32 EventIndex)
 {
-	if (ParrtenIndex == 2 && EventIndex == 0)
+	if ( ParrtenIndex == 0)
+	{
+		Owner->ShowHammer(false);
+		FVector MoveLocation = Owner->HammerComp->GetComponentLocation();
+		ThorHammer->SetActorLocation(MoveLocation);
+
+	}
+	else if (ParrtenIndex == 2 && EventIndex == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Kick !!!!"));
 	}
@@ -143,4 +162,5 @@ void UThor_ATTACK_HAMMER_THROW_START::NotifyEventPattern_C(int32 EventIndex)
 		UE_LOG(LogTemp, Warning, TEXT("Kick End!!!!"));
 		StartPattern();
 	}
+	
 }

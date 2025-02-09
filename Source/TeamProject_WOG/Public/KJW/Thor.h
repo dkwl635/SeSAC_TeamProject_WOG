@@ -37,6 +37,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USkeletalMeshComponent* BodyComp;
+
+	UPROPERTY(EditAnywhere , BlueprintReadWrite)
+	class UStaticMeshComponent* HammerComp;
+
 //애니메이션 관련
 private:
 	UPROPERTY()
@@ -105,9 +109,15 @@ public:
 	//맵 사이즈에서 랜덤 위치 리턴
 	FVector GetMoveRandomPos(FVector SpawnPos , float MapSize , float Dist);
 	
-
 public:
 	//특수한 패턴종료시 Idle 상태 유지를 위한 
 	void SetIdleTimer(float IdleTimer);
 
+
+public:
+	//토르 망치 On/Off
+	bool IsHammer = true;
+	UFUNCTION(BlueprintCallable)
+	void ShowHammer(bool bShow);
+	
 };
