@@ -39,11 +39,6 @@ public:
 	float DashTimer = 0;
 	float DashDuringTimer = 0;
 
-public:
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AThorHammer> ThorHammerClass;
-	class AThorHammer* ThorHammer;
-
 protected:
 	virtual void InitPattern(class AThor* Thor) override;
 	virtual void StartPattern_C() override;
@@ -52,4 +47,6 @@ protected:
 	virtual bool TickPattern_C() override;
 	virtual void NotifyTickPattrern_C(int32 EventIndex , float FrameDeltaTime) override;
 	virtual void NotifyEventPattern_C(int32 EventIndex) override;
+
+	virtual bool IsStartable() override;
 };

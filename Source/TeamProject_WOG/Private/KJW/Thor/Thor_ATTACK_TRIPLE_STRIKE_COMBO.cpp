@@ -43,7 +43,7 @@ void UThor_ATTACK_TRIPLE_STRIKE_COMBO::NotifyEventPattern_C(int32 EventIndex)
 	}
 	else
 	{
-		Start =Owner->GetSkeletalMesh()->GetSocketLocation(TEXT("hand_r"));
+		Start = Owner->GetSkeletalMesh()->GetSocketLocation(TEXT("hand_r"));
 	}
 
 	// 구의 반경

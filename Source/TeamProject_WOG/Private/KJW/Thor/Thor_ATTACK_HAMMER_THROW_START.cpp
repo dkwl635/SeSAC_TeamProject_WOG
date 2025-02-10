@@ -8,11 +8,7 @@ void UThor_ATTACK_HAMMER_THROW_START::InitPattern(AThor* Thor)
 {
 	Super::InitPattern(Thor);
 
-	if ( ThorHammerClass )
-	{
-		ThorHammer =Owner->GetWorld()->SpawnActor<AThorHammer>(ThorHammerClass);
-		ThorHammer->SetActorLocation(FVector(1000));
-	}
+	
 }
 
 void UThor_ATTACK_HAMMER_THROW_START::StartPattern_C()
@@ -131,7 +127,13 @@ bool UThor_ATTACK_HAMMER_THROW_START::TickPattern_C()
 
 void UThor_ATTACK_HAMMER_THROW_START::NotifyTickPattrern_C(int32 EventIndex, float FrameDeltaTime)
 {
-	if (ParrtenIndex == 2)
+	if ( ParrtenIndex == 0 )
+	{
+		FVector distance = Owner->Target->GetActorLocation() - Owner->GetActorLocation();
+		FRotator rot = distance.Rotation();
+		Owner->SetActorRotation(rot);
+	}
+	else if (ParrtenIndex == 2)
 	{
 		FVector distance = Owner->Target->GetActorLocation() - Owner->GetActorLocation();
 		if (distance.Size() < 150) { return; }
@@ -141,6 +143,7 @@ void UThor_ATTACK_HAMMER_THROW_START::NotifyTickPattrern_C(int32 EventIndex, flo
 		FVector newMovePos = Owner->GetActorLocation() + (distance * FrameDeltaTime * 500.f);
 		Owner->SetActorLocationAndRotation(newMovePos, rot);
 	}
+	
 
 }
 
@@ -150,7 +153,8 @@ void UThor_ATTACK_HAMMER_THROW_START::NotifyEventPattern_C(int32 EventIndex)
 	{
 		Owner->ShowHammer(false);
 		FVector MoveLocation = Owner->HammerComp->GetComponentLocation();
-		ThorHammer->SetActorLocation(MoveLocation);
+		Owner->ThorHammer->SetActorLocation(MoveLocation);
+		Owner->ThorHammer->StartHammerFly(Owner->GetActorForwardVector());
 
 	}
 	else if (ParrtenIndex == 2 && EventIndex == 0)
@@ -163,4 +167,9 @@ void UThor_ATTACK_HAMMER_THROW_START::NotifyEventPattern_C(int32 EventIndex)
 		StartPattern();
 	}
 	
+}
+
+bool UThor_ATTACK_HAMMER_THROW_START::IsStartable()
+{
+	return !Owner->ThorHammer->IsHammerFly;
 }

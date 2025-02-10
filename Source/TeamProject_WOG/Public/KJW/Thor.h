@@ -119,5 +119,8 @@ public:
 	bool IsHammer = true;
 	UFUNCTION(BlueprintCallable)
 	void ShowHammer(bool bShow);
-	
+	//날아가는 망치
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AThorHammer> ThorHammerClass;
+	class AThorHammer* ThorHammer;
 };

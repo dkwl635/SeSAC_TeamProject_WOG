@@ -92,6 +92,7 @@ private:
      void NotifyEndPattrern_BP_Implementation(int32 EventIndex);
      void NotifyTickPattrern_BP_Implementation(int32 EventIndex, float FrameDeltaTime);
 
+
 protected:
     UPROPERTY(EditAnywhere)
     bool bHitable = false;
@@ -101,6 +102,7 @@ protected:
 public:
     bool IsHitable() { return bHitable; }
     bool IsEndPattern() { return bEndPattern; }
+    virtual bool IsStartable(){ return true; }
 
 public:
     //특수한 값을 줄때 사용할 함수
@@ -109,5 +111,8 @@ public:
 protected :
     FVector MapPoint = FVector::ZeroVector;
     float MapSize = 1000.0f;
+
+
+   
 };
 

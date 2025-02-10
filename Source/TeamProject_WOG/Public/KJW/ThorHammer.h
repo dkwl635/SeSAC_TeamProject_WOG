@@ -26,11 +26,21 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+public:
 	void StartHammerFly(FVector Direction);
+	void HammerFly(FVector Direction);
+	void HammerMoveTick();
 	void ReturnHammerFly();
 
+public:
+	UPROPERTY(EditAnywhere)
+	float MoveSpeed = 1500.0f;
+private:
+	FRotator HamerFly = FRotator(90.0f , 0.0f , 0.0f);
+	FVector FlyDirection = FVector::ZeroVector;
+
+	FTimerHandle FlyMoveTimerHandle;
+	float MoveTimer = 0.0f;
+public:
+	bool IsHammerFly = false;
 };

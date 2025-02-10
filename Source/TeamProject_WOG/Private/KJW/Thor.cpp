@@ -6,7 +6,7 @@
 #include "KJW/ThorAnimInstance.h"
 #include "KJW/ThorPattern.h"
 #include "KJW/Thor/Thor_Idle.h"
-
+#include "KJW/ThorHammer.h"
 // Sets default values
 AThor::AThor()
 {
@@ -35,6 +35,12 @@ void AThor::BeginPlay()
 
 	Target = GetWorld()->GetFirstPlayerController()->GetPawn();
 	if ( Target ) { UE_LOG(LogTemp , Warning , TEXT("Is Target")); }
+
+	if ( ThorHammerClass )
+	{
+		ThorHammer = Owner->GetWorld()->SpawnActor<AThorHammer>(ThorHammerClass);
+		ThorHammer->SetActorLocation(FVector(1000));
+	}
 }
 
 // Called every frame
