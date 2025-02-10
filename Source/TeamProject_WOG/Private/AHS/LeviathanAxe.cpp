@@ -43,7 +43,7 @@ void ALeviathanAxe::Tick(float DeltaTime)
         float T = FMath::Clamp(ElapsedTime / MoveDuration , 0.0f , 1.0f);
 
         // 베지어 곡선 공식 적용
-        FVector ControlPoint = ( StartPos + EndPos ) / 2 + FVector(0 , 0 , 300);
+        FVector ControlPoint = ( StartPos + EndPos ) / 2 + FVector(1000 , 0 , 100);
         FVector NewPos = FMath::Lerp(
             FMath::Lerp(StartPos , ControlPoint , T) ,
             FMath::Lerp(ControlPoint , EndPos , T) ,

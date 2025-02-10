@@ -133,6 +133,7 @@ public:
 //5. 공격 
 public:
 	// 소환된 도끼
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontage)
 	class ALeviathanAxe* AxeActor;
 
 	 // 도끼의 스폰 클래스
