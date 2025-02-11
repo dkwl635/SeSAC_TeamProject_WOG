@@ -28,7 +28,7 @@ void UThor_Idle::TickPattern_CBP()
 	FRotator StartRot = Owner -> GetActorRotation();
 	FRotator EndRot = FRotator::ZeroRotator;
 
-	float Delta = 0.2f;
+	float Delta = 0.1f;
 	bool bShortestPath = true;
 	
 	FVector ActorLocation = Owner-> GetActorLocation();
