@@ -12,6 +12,39 @@
 
 #include "KratosCharacter.generated.h"
 
+UENUM(BlueprintType)
+enum class EKratosState : uint8 {
+// 기본 상태
+	Idle UMETA(DisplayName = "Normal Idle") ,
+	Move UMETA(DisplayName = "Move") ,
+	Shield UMETA(DisplayName = "Shield") ,
+	Dodge UMETA(DisplayName = "Dodge") ,
+	Damage UMETA(DisplayName = "Damaged") ,
+	Die UMETA(DisplayName = "Die") ,
+
+// 기본 공격(주먹)
+	Attack UMETA(DisplayName = "Attack"),
+
+	FistAttack UMETA(DisplayName = "Fist Attack") ,
+	FistAttackCombo UMETA(DisplayName = "Fist Attack Combo") ,
+
+// 무기 - 도끼 공격
+	SheathAxe UMETA(DisplayName = "Sheath Axe") ,
+	SheathAxeIdle UMETA(DisplayName = "Sheath Axe Idle") ,
+	AxeMeleeAttack UMETA(DisplayName = "Axe Melee Attack") ,
+
+	AxeAim UMETA(DisplayName = "Axe Aiming") ,
+	AxeUnAim UMETA(DisplayName = "Axe UnAiming") ,
+
+	AxeRangedAttack UMETA(DisplayName = "Axe Ranged Attack") ,
+	AxeMeleeAttackCombo UMETA(DisplayName = "Axe Melee Attack Combo") ,
+
+// 분노 상태(Rage)
+	RageIdle UMETA(DisplayName = "Rage Idle") ,
+	RageAttackCombo UMETA(DisplayName = "Rage Attack Combo") ,
+};
+
+
 UCLASS()
 class TEAMPROJECT_WOG_API AKratosCharacter : public ACharacter, public ICombatInterface
 {
@@ -34,6 +67,10 @@ public:
 
 // 0. Properties
 public:
+	// 기본 상태
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = KratosState)
+	EKratosState mState = EKratosState::Idle;
+
 	// HP
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
 	float Health = 100.0f;
@@ -42,20 +79,48 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
 	float Rage = 100.0f;
 
-	// 상태 관리(FSM)
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
-	class UKratosFSM* fsm;
+	// 카메라 회전 제한
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
+	float VerticalRotationSpeed = 0.5f; // 기본값보다 작게 조정
 
-// 2. Camera
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
+	float HorizontalRotationSpeed = 0.25f;
+
+	// 이동 속도
+	UPROPERTY(EditAnywhere , Category = PlayerSettings)
+	float WalkSpeed = 600.0f;
+
+	// 이동 방향
+	FVector Direction;
+
+	// 무기가 있는지 여부
+	UPROPERTY(EditDefaultsOnly, Category = PlayerSettings)
+	bool Kratos_HasWeapon = true;
+
+	// 무기 장착 여부
+	UPROPERTY(EditDefaultsOnly, Category = PlayerSettings)
+	bool Kratos_EquippedWeapon = false;
+
+	// 무기 장착 후, 에임 상태 진입
+	UPROPERTY(EditDefaultsOnly, Category = PlayerSettings)
+	bool AimAttackState = false;
+
+	// 무기 장착 상태 반환(BluePrint에서 장착된 무기의 Visibility 설정에 사용중)
+	UFUNCTION(BlueprintPure)
+	bool Get_KratosEquippedWeapon() const;
+
+
+
+// 1. Camera
 public:
 	UPROPERTY( EditDefaultsOnly , Category = Camera)
 	class USpringArmComponent* springArmComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
 	class UCameraComponent* KratosCamComp;
+
 	
-// Camera Input
-public:
+//2. Input
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputMappingContext* IMC_Kratos;
 
@@ -65,94 +130,77 @@ public:
 	UPROPERTY( EditDefaultsOnly , Category = "Input" )
 	class UInputAction* IA_Turn;
 
-	void Turn(const FInputActionValue& inputValue);
-
-	void LookUp(const FInputActionValue& inputValue);
-
-// 3. Movement Input
-public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Move;
-
-	// 이동 속도
-	UPROPERTY(EditAnywhere, Category = PlayerSettings)
-	float WalkSpeed = 600.0f;
-
-	// 이동 방향
-	FVector Direction;
-
-	void Move(const FInputActionValue& inputValue);
-
-// 4. 무기 장착
-public:
-	bool AimAttackState = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Aim;
 
-	void AimAxeAttack(const FInputActionValue& inputValue);
-
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Return;
 
-	UPROPERTY(EditAnywhere , Category = AnimMontage)
-	UAnimMontage* Return_Axe_Montage;
-
-	void ReturnAxetoHand(const FInputActionValue& inputValue);
-
-private:
-	UPROPERTY(EditAnywhere , Category = AnimMontage)
-	UAnimMontage* Equip_Axe_Montage;
-
-
-	UPROPERTY(EditAnywhere , Category = AnimMontage)
-	UAnimMontage* Attack_Axe_Montage;
-
-	bool Temp = true;
-
-private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Sheath_UnSheath;
 
+	//도끼 원거리 공격
+	UPROPERTY(EditDefaultsOnly , Category = "Input")
+	class UInputAction* IA_Attack;
+
+
+	// 카메라 회전
+	void Turn(const FInputActionValue& inputValue);
+
+	void LookUp(const FInputActionValue& inputValue);
+
+	// 플레이어 이동
+	void Move(const FInputActionValue& inputValue);
+	// 에임(무기 던지기) 상태
+	void AimAxeAttack(const FInputActionValue& inputValue);
+
+	// 던진 무기 돌려받기
+	void ReturnAxetoHand(const FInputActionValue& inputValue);
+
+	// 무기 장착 및 해제
 	void SheathAction(const FInputActionValue& inputValue);
 
-	// Default Settings
-	UPROPERTY(EditDefaultsOnly, Category = PlayerSettings)
-	bool Kratos_HasWeapon = true;
+	// 공격
+	void AttackAction(const FInputActionValue& inputValue);
 
-	UPROPERTY(EditDefaultsOnly, Category = PlayerSettings)
-	bool Kratos_EquippedWeapon = false;
+//3. 애니메이션
+	UPROPERTY(EditAnywhere , Category = AnimMontage)
+	UAnimMontage* Equip_Axe_Montage;
 
 	UPROPERTY(EditAnywhere, Category = AnimMontage)
 	UAnimMontage* UnEquip_Axe_Montage;
 
-public:
-	UFUNCTION(BlueprintPure)
-	bool Get_KratosEquippedWeapon() const;
+	UPROPERTY(EditAnywhere , Category = AnimMontage)
+	UAnimMontage* Attack_Axe_Montage;
 
-//5. 공격 
+	UPROPERTY(EditAnywhere , Category = AnimMontage)
+	UAnimMontage* Return_Axe_Montage;
+
+	// 도끼 근접 공격
+	UPROPERTY(EditAnywhere, Category = AnimMontage)
+	UAnimMontage* Melee_Attack_Montage;
+
+	// 근접 공격(주먹)
+	UPROPERTY(EditAnywhere, Category = AnimMontage)
+	UAnimMontage* Fist_Attack_Montage;
+
+
+//4. 도끼
 public:
 	// 소환된 도끼
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontage)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Axe)
 	class ALeviathanAxe* AxeActor;
 
 	 // 도끼의 스폰 클래스
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     TSubclassOf<ALeviathanAxe> AxeClass;
 
-
-	//도끼 원거리 공격
-	UPROPERTY(EditDefaultsOnly , Category = "Input")
-	class UInputAction* IA_Attack;
-
-	void AttackAction(const FInputActionValue& inputValue);
-
-	// 도끼 스폰
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AnimMontage)
+	// 도끼 스폰 포인트
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Axe)
 	class UArrowComponent* AxeSpawnPoint;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<class ALeviathanAxe> SpawnedAxe;
 
 	// 도끼 Aim UI 위젯
 	UPROPERTY(EditDefaultsOnly, Category = AimAxeUI)
@@ -171,15 +219,27 @@ public:
 	//도끼 불러오기
 	void RecallAxe();
 
+//-----------------------------------------
+// 2/11(화)
+	void IsAiming(bool bIsAiming);
+	
+	// 공격 모션 후, 대기 시간
+	float currentTime = 0.0f;
+
+	// 두 번 누르면 중복 공격되지 않도록 처리
+	bool ClickOnce = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Fist)
+	class USphereComponent* Fist_R;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Fist)
+	class USphereComponent* Fist_L;
+
+
+
+
+
 	//-------------------------------------------------------------------
-	// 도끼 근접 공격
-	UPROPERTY(EditAnywhere, Category = AnimMontage)
-	UAnimMontage* Melee_Attack_Montage;
-
-	// 근접 공격(주먹)
-	UPROPERTY(EditAnywhere, Category = AnimMontage)
-	UAnimMontage* Fist_Attack_Montage;
-
 	// ICombatInterface을(를) 통해 상속됨
 	void SetCharacterState(EWOG_Character_State NewState) override;
 	void TakeKDamage(const FWOG_DamageEvent& DamageEvent , ICombatInterface* DamageCauser) override;

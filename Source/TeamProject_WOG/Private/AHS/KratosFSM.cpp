@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "KratosFSM.h"
+#include "AHS/KratosFSM.h"
 #include "AHS/KratosCharacter.h"
 #include "GameFramework/Character.h"
 
@@ -16,7 +16,7 @@ UKratosFSM::UKratosFSM()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
-	bHasAxe = false;
+	//bHasAxe = false;
 }
 
 
@@ -26,7 +26,7 @@ void UKratosFSM::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	KratosCharacter = Cast<AKratosCharacter>(GetOwner());
+	//KratosCharacter = Cast<AKratosCharacter>(GetOwner());
 	
 }
 
@@ -38,9 +38,10 @@ void UKratosFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
-	FString logMsg = UEnum::GetValueAsString(mState);
-	GEngine->AddOnScreenDebugMessage(0 , 1 , FColor::Red , logMsg);
+	//FString logMsg = UEnum::GetValueAsString(mState);
+	//GEngine->AddOnScreenDebugMessage(0 , 1 , FColor::Red , logMsg);
 
+	/*
 	switch ( mState ) {
 	case EKratosState::Idle: { IdleState(); } break;
 	case EKratosState::Move: { MoveState(); } break;
@@ -48,10 +49,11 @@ void UKratosFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompo
 	case EKratosState::Damage: { DamageState(); } break;
 	case EKratosState::Die: { DieState(); } break;
 	}
+	*/
 }
 
 
-
+/*
 void UKratosFSM::SetState(EKratosState NewState)
 {
 	mState = NewState;
@@ -144,3 +146,4 @@ bool UKratosFSM::IsAiming()
 {
 	return KratosCharacter && KratosCharacter->AimAttackState;
 }
+*/

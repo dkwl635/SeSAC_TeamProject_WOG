@@ -9,7 +9,7 @@
 
 
 UENUM(BlueprintType)
-enum class EKratosState : uint8 {
+enum class EKratosState_FSM : uint8 {
 	Idle UMETA(DisplayName = "대기") ,
 	Move UMETA(DisplayName = "이동") ,
 	Sheath UMETA(DisplayName = "무기 장착") ,
@@ -40,7 +40,7 @@ public:
 
 public:
 
-
+/*
 	// 현재 상태
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSM)
 	EKratosState mState = EKratosState::Idle;
@@ -94,5 +94,6 @@ public:
 	void UpdateWeaponState(bool bNewHasAxe);
 	void PlayPunchAttack();
 	bool IsAiming();
+	*/
 
 };
