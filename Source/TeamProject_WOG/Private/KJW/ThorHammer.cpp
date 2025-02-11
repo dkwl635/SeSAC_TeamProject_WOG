@@ -4,6 +4,7 @@
 #include "KJW/ThorHammer.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "AHS/KratosCharacter.h"
 
 // Sets default values
 AThorHammer::AThorHammer()
@@ -27,6 +28,9 @@ void AThorHammer::BeginPlay()
 
 void AThorHammer::HammerFly(FVector Direction)
 {
+	SphereComp->SetSimulatePhysics(false);
+	SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
 	//날아가는 방향으로 머리 회전 시키기
 	FlyDirection = Direction;
 
@@ -41,6 +45,7 @@ void AThorHammer::HammerFly(FVector Direction)
 
 void AThorHammer::StartHammerFly(FVector Direction)
 {
+
 	//날아가는 2초동안 날아가게
 	HammerFly(Direction);
 	IsHammerFly = true;
@@ -68,5 +73,65 @@ void AThorHammer::ReturnHammerFly()
 	IsHammerFly = false;
 
 	SetActorLocation(FVector(0.0f , 0.f , -200.f));
+}
+
+void AThorHammer::HammerDown()
+{
+	float DeltaTime = 0.02f;
+
+	FVector CurPos = GetActorLocation();
+	//바닥에 닿았을 때 Z 좌표 비교
+	if ( CurPos.Z < 33.0f )
+	{
+		//물리 off
+		SphereComp->SetSimulatePhysics(false);
+		SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		//타임헨들 클리어
+		if ( FlyDownTimerHandle.IsValid() )
+		{
+			GetWorldTimerManager().ClearTimer(FlyDownTimerHandle);
+		}
+
+	}
+	else
+	{
+		// 아래쪽으로 향하게
+		FRotator TargetRotation = FRotationMatrix::MakeFromZ(FVector::DownVector).Rotator();
+	
+		// 현재 회전 가져오기
+		FRotator CurrentRotation = GetActorRotation();
+		// 부드럽게 보간하여 회전 적용
+		FRotator NewRotation = FMath::RInterpTo(CurrentRotation , TargetRotation , DeltaTime , 2.0f);
+		SetActorRotation(NewRotation);
+		
+	}
+
+}
+
+void AThorHammer::OnCollisionOverlap(AActor* Otherctor)
+{
+	ACharacter* player = Cast<ACharacter>(Otherctor);
+	if (player)
+	{
+		SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		SphereComp->SetSimulatePhysics(true);
+		
+		FVector AddForce = FlyDirection * -1 * 10000.0f;
+		AddForce.Z = 10000.0f;
+		
+		SphereComp->AddImpulse(AddForce);
+
+		GetWorldTimerManager().SetTimer(FlyDownTimerHandle , this , &ThisClass::HammerDown , 0.02f , true , 0.0f);		
+	}
+	else
+	{
+
+	}
+
+	if (FlyMoveTimerHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(FlyMoveTimerHandle);
+	}
+
 }
 

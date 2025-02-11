@@ -11,6 +11,7 @@ void UThorPattern::InitPattern(AThor* Thor)
 	Owner = Thor;
 	//임시 맵 중앙 포인트 나중에 ? 게임모드나 그런쪽에서 셋팅 아니면 토르에 넣어놓기
 	MapPoint = Thor->GetActorLocation();
+	MapSize = Thor->MapSize;
 }
 
 void UThorPattern::StartPattern()

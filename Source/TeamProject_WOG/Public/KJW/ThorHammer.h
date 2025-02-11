@@ -31,6 +31,7 @@ public:
 	void HammerFly(FVector Direction);
 	void HammerMoveTick();
 	void ReturnHammerFly();
+	void HammerDown();
 
 public:
 	UPROPERTY(EditAnywhere)
@@ -40,7 +41,13 @@ private:
 	FVector FlyDirection = FVector::ZeroVector;
 
 	FTimerHandle FlyMoveTimerHandle;
+	FTimerHandle FlyDownTimerHandle;
 	float MoveTimer = 0.0f;
 public:
 	bool IsHammerFly = false;
+
+	float Damage = 10.0f;
+public:
+	UFUNCTION(BlueprintCallable)
+	void OnCollisionOverlap(AActor* Otherctor);
 };

@@ -222,7 +222,7 @@ void AThor::OnMontageEnded(UAnimMontage* Montage , bool bInterrupted)
 	}
 }
 
-FVector AThor::GetMoveRandomPos(FVector SpawnPos , float MapSize , float Dist)
+FVector AThor::GetMoveRandomPos(FVector SpawnPos , float Dist)
 {
 	FVector Result = FVector::ZeroVector;
 	MapSize /= 2;

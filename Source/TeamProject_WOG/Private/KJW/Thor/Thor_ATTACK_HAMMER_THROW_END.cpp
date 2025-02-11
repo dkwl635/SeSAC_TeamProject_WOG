@@ -15,9 +15,9 @@ void UThor_ATTACK_HAMMER_THROW_END::InitPattern(AThor* Thor)
 
 void UThor_ATTACK_HAMMER_THROW_END::StartPattern_C()
 {
-	FVector NewHammerPos = Owner->GetActorLocation();
-	NewHammerPos += Owner->GetActorForwardVector() * 1500.0f;
-	Owner->ThorHammer->SetActorLocation(NewHammerPos);
+	//FVector NewHammerPos = Owner->GetActorLocation();
+	//NewHammerPos += Owner->GetActorForwardVector() * 1500.0f;
+	//Owner->ThorHammer->SetActorLocation(NewHammerPos);
 
 }
 

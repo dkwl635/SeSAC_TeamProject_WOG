@@ -107,7 +107,7 @@ public:
 	
 public:
 	//맵 사이즈에서 랜덤 위치 리턴
-	FVector GetMoveRandomPos(FVector SpawnPos , float MapSize , float Dist);
+	FVector GetMoveRandomPos(FVector SpawnPos , float Dist);
 	
 public:
 	//특수한 패턴종료시 Idle 상태 유지를 위한 
@@ -123,4 +123,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AThorHammer> ThorHammerClass;
 	class AThorHammer* ThorHammer;
+
+	//맵 사이즈
+	UPROPERTY(EditDefaultsOnly)
+	float MapSize = 3000.f;
 };

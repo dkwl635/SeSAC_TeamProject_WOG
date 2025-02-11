@@ -109,6 +109,8 @@ public:
 
 protected :
     FVector MapPoint = FVector::ZeroVector;
+
+
     float MapSize = 1000.0f;
 
 
