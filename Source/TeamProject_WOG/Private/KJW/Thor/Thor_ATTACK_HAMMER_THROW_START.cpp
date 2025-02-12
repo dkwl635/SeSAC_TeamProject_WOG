@@ -39,9 +39,15 @@ void UThor_ATTACK_HAMMER_THROW_START::StartPattern_C()
 		{
 			float addAngleDeg = 15 * i;
 			FVector checkDir = Distance.RotateAngleAxis(addAngleDeg, FVector::UpVector);
+			
 			FVector checkLocation = Owner->GetActorLocation() + (checkDir * dashDistance);
-
 			if (FVector::Distance(checkLocation, MapPoint) < MapSize - 100)
+			{
+				MoveableVector.Add(checkLocation);
+			}
+
+			 checkLocation = Owner->GetActorLocation() + ( checkDir * (dashDistance * 0.5f) );
+			if ( FVector::Distance(checkLocation , MapPoint) < MapSize - 100 )
 			{
 				MoveableVector.Add(checkLocation);
 			}
@@ -155,7 +161,10 @@ void UThor_ATTACK_HAMMER_THROW_START::NotifyEventPattern_C(int32 EventIndex)
 		Owner->ShowHammer(false);
 		FVector MoveLocation = Owner->HammerComp->GetComponentLocation();
 		Owner->ThorHammer->SetActorLocation(MoveLocation);
-		Owner->ThorHammer->StartHammerFly(Owner->GetActorForwardVector());
+
+		FVector flyDir = (Owner->Target->GetActorLocation() + FVector(0.0f , 0.0f , 30.0f)) - MoveLocation;
+		flyDir.Normalize();
+		Owner->ThorHammer->StartHammerFly(flyDir);
 
 	}
 	else if (ParrtenIndex == 2 && EventIndex == 0)

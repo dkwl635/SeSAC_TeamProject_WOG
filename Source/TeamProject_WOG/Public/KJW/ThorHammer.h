@@ -50,10 +50,14 @@ public:
 
 	float Damage = 10.0f;
 public:
-	UFUNCTION(BlueprintCallable)
-	void OnCollisionOverlap(AActor* Otherctor);
+
+	UFUNCTION()
+	void OverlapHammer(
+	  UPrimitiveComponent* OverlappedComponent , AActor*  OtherActor , UPrimitiveComponent*  OtherComp , int32  OtherBodyIndex , bool  bFromSweep , const FHitResult&  SweepResult);
 
 public:
 	UPROPERTY()
 	class AThor* Thor;
+	bool IsGround = false;
+
 };
