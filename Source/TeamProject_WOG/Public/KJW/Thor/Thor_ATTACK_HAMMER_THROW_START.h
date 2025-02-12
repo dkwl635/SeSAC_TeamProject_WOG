@@ -28,6 +28,9 @@ public:
 	UAnimMontage* KickAnimMontage;
 	UPROPERTY(EditAnywhere)
 	float AttackRange = 500.f;
+	//킥 공격 범위
+	UPROPERTY(EditAnywhere)
+	float KickAttackRadius = 300.f;
 
 	//0-망치 던지기
 	//1-백대쉬  
@@ -49,4 +52,7 @@ protected:
 	virtual void NotifyEventPattern_C(int32 EventIndex) override;
 
 	virtual bool IsStartable() override;
+
+	UFUNCTION()
+	void OnOverlapHammer();
 };

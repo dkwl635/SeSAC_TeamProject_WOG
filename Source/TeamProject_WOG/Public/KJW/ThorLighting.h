@@ -32,4 +32,15 @@ public:
 	void SpawnLighting();
 
 	void SpawnLighting_Implementation();
+
+	UFUNCTION(BlueprintCallable)
+	void TakeLightingDamage();
+
+	UPROPERTY()
+	class AThor* Thor;
+
+	UPROPERTY(EditAnywhere)
+	float Damage = 10;
+
+
 };

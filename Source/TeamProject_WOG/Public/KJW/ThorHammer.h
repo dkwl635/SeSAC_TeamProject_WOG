@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "ThorHammer.generated.h"
 
+
+
 UCLASS()
 class TEAMPROJECT_WOG_API AThorHammer : public AActor
 {
@@ -50,4 +52,8 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
 	void OnCollisionOverlap(AActor* Otherctor);
+
+public:
+	UPROPERTY()
+	class AThor* Thor;
 };

@@ -3,6 +3,7 @@
 
 #include "KJW/Thor/Thor_ATTACK_HAMMER_THROW_START.h"
 #include "KJW/ThorHammer.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 void UThor_ATTACK_HAMMER_THROW_START::InitPattern(AThor* Thor)
 {
@@ -160,6 +161,29 @@ void UThor_ATTACK_HAMMER_THROW_START::NotifyEventPattern_C(int32 EventIndex)
 	else if (ParrtenIndex == 2 && EventIndex == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Kick !!!!"));
+
+		FHitResult OutHit;
+		// 레이의 시작 지점
+		FVector Start = FVector(0.f , 0.f , 0.f);
+		Start = Owner->GetActorLocation() + Owner->GetActorForwardVector() * KickAttackRadius;
+
+		// 충돌 쿼리 파라미터
+		FCollisionQueryParams CollisionParams;
+		bool bHit = Owner->GetWorld()->SweepSingleByChannel(OutHit , Start , Start , FQuat::Identity , EWOGTraceChannel::EnemyAttackTrace , FCollisionShape::MakeSphere(KickAttackRadius) , CollisionParams);
+
+		FColor SphereColor = bHit ? FColor::Red : FColor::Green;
+		DrawDebugSphere(Owner->GetWorld() , Start , KickAttackRadius , 12 , SphereColor , false , 1.0f , 0 , 2.0f);
+
+		if ( bHit )
+		{
+			FWOG_DamageEvent DamageData;
+			DamageData.DamageValue = 10;
+			DamageData.HitPoint = OutHit.ImpactPoint;
+			Owner->Target->TakeKDamage(DamageData , Owner);
+			FVector PlayerVelocity = Owner->Target->GetActorForwardVector();
+			Owner->Target->GetCharacterMovement()->Velocity = PlayerVelocity * -1.0f * 50000.0f;
+		}
+
 	}
 	else if (ParrtenIndex == 2 && EventIndex == 1)
 	{
@@ -172,4 +196,12 @@ void UThor_ATTACK_HAMMER_THROW_START::NotifyEventPattern_C(int32 EventIndex)
 bool UThor_ATTACK_HAMMER_THROW_START::IsStartable()
 {
 	return !Owner->ThorHammer->IsHammerFly;
+}
+
+void UThor_ATTACK_HAMMER_THROW_START::OnOverlapHammer()
+{
+	FWOG_DamageEvent DamageData;
+	DamageData.DamageValue = 10;
+	DamageData.HitPoint = Owner->ThorHammer->GetActorLocation();
+	Owner->Target->TakeKDamage(DamageData , Owner);
 }

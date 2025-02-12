@@ -2,6 +2,8 @@
 
 #include "KJW/ThorLighting.h"
 #include "Components/SphereComponent.h"
+#include "KJW/Thor.h"
+#include "AHS/KratosCharacter.h"
 
 // Sets default values
 AThorLighting::AThorLighting()
@@ -29,5 +31,17 @@ void AThorLighting::Tick(float DeltaTime)
 
 void AThorLighting::SpawnLighting_Implementation()
 {
+}
+
+void AThorLighting::TakeLightingDamage()
+{
+	if ( Thor )
+	{
+		FWOG_DamageEvent DamageData;
+		DamageData.DamageValue = 10;
+		DamageData.HitPoint = GetActorLocation();
+		Thor->Target->TakeKDamage(DamageData , Thor);
+	}
+	
 }
 

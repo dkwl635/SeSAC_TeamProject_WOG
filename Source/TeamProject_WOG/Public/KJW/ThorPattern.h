@@ -6,6 +6,7 @@
 #include "UObject/Object.h"
 #include "TeamProject_WOG/TeamProject_WOG.h"
 #include "KJW/Thor.h"
+#include "AHS/KratosCharacter.h"
 #include "ThorPattern.generated.h"
 
 

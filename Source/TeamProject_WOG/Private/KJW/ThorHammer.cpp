@@ -5,7 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "AHS/KratosCharacter.h"
-
+#include "KJW/Thor.h"
 // Sets default values
 AThorHammer::AThorHammer()
 {
@@ -122,6 +122,14 @@ void AThorHammer::OnCollisionOverlap(AActor* Otherctor)
 		SphereComp->AddImpulse(AddForce);
 
 		GetWorldTimerManager().SetTimer(FlyDownTimerHandle , this , &ThisClass::HammerDown , 0.02f , true , 0.0f);		
+		
+		if ( Thor )
+		{
+			FWOG_DamageEvent DamageData;
+			DamageData.DamageValue = 10;
+			DamageData.HitPoint = GetActorLocation();
+			Thor->Target->TakeKDamage(DamageData , Thor);
+		}
 	}
 	else
 	{

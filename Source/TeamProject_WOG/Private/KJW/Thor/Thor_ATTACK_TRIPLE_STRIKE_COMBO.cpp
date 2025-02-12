@@ -57,6 +57,11 @@ void UThor_ATTACK_TRIPLE_STRIKE_COMBO::NotifyEventPattern_C(int32 EventIndex)
 
 	if (bHit)
 	{
+		FWOG_DamageEvent DamageData;
+		DamageData.DamageValue = 10;
+		DamageData.HitPoint = OutHit.ImpactPoint;
+		Owner->Target->TakeKDamage(DamageData , Owner);
+
 		UE_LOG(LogTemp, Warning, TEXT("충돌한 액터: %s"), *OutHit.GetActor()->GetName());
 	}
 	

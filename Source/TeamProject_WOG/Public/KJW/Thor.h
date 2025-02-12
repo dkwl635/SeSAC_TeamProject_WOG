@@ -51,7 +51,7 @@ public:
 //크레토스가 들어갈 공간	
 public:
 	UPROPERTY()
-	AActor* Target;
+	class AKratosCharacter* Target;
 
 //WOG 전투 관련 인터페이스
 public:

@@ -33,14 +33,16 @@ void AThor::BeginPlay()
 	ThorAnimIns->OnMontageEnded.AddDynamic(this , &ThisClass::OnMontageEnded);
 	InitPatternClass();
 
-	Target = GetWorld()->GetFirstPlayerController()->GetPawn();
+	Target = Cast<AKratosCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	if ( Target ) { UE_LOG(LogTemp , Warning , TEXT("Is Target")); }
 
 	if ( ThorHammerClass )
 	{
 		ThorHammer = Owner->GetWorld()->SpawnActor<AThorHammer>(ThorHammerClass);
-		ThorHammer->SetActorLocation(FVector(1000));
+		ThorHammer->SetActorLocation(FVector(-1000));
 	}
+	
+	ThorHammer->Thor = this;
 }
 
 // Called every frame
