@@ -25,5 +25,6 @@ public:
 	// 플레이어 좌우 이동 속도
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = KratosAnimInstance)
 	float Direction = 0.0f;
+
 	
 };

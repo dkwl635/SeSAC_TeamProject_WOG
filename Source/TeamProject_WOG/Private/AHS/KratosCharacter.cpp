@@ -13,6 +13,7 @@
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimInstance.h"
 #include "Components/SphereComponent.h"
+#include "KJW/Thor.h"
 
 
 
@@ -48,20 +49,12 @@ AKratosCharacter::AKratosCharacter()
 	// 3. 주먹 콜리전 구현
 	Fist_R = CreateDefaultSubobject<USphereComponent>(TEXT("Fist_R"));
 	Fist_R->SetRelativeScale3D(FVector(0.05f));
-	Fist_R->SetupAttachment(GetMesh());
-
-	//Fist_R->SetupAttachment(GetMesh()->GetSocketByName("RightHand"));
+	Fist_R->SetupAttachment(GetMesh() , FName(TEXT("Hand_R")));
+	
 
 	Fist_L = CreateDefaultSubobject<USphereComponent>(TEXT("Fist_L"));
 	Fist_L->SetRelativeScale3D(FVector(0.05f));
-	Fist_L->SetupAttachment(GetMesh());
-
-	/*
-	if ( GetMesh() && GetMesh()->DoesSocketExist("Armmed") )
-	{
-		SpawnLocation = GetMesh()->GetSocketLocation("Armmed");
-	}
-	*/
+	Fist_L->SetupAttachment(GetMesh(), FName(TEXT("Hand_L")));
 
 
 }
@@ -432,6 +425,22 @@ void AKratosCharacter::RecallAxe()
 		FVector HandLocation = GetMesh()->GetSocketLocation("Armmed");
 		AxeActor->ReturnAxe(HandLocation);
 		AxeActor = nullptr;
+	}
+}
+
+//----------------------------------------------------------------------------------
+
+void AKratosCharacter::OnLeftHandOverlapBP(AActor* OtherActor , FVector SweepResult)
+{
+	AThor* thor = Cast<AThor>(OtherActor);
+	if ( thor != nullptr ) {
+		UE_LOG(LogTemp , Warning , TEXT("Thor"));
+
+		FWOG_DamageEvent DamageData;
+		DamageData.DamageValue = 10;
+		DamageData.HitPoint = SweepResult;
+
+		thor->TakeKDamage(DamageData , this);
 	}
 }
 

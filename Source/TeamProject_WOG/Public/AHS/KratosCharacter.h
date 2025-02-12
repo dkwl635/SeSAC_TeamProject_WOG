@@ -249,6 +249,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Fist)
 	class USphereComponent* Fist_L;
 
+//2/12(수) 주먹 공격 Collision 구현
+	UFUNCTION(BlueprintCallable)
+	void OnLeftHandOverlapBP(  AActor* OtherActor   , FVector SweepResult);
+
 
 
 
