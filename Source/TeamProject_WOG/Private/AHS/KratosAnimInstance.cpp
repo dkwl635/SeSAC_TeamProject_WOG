@@ -19,4 +19,8 @@ void UKratosAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	FVector forwardVector = kratos->GetActorForwardVector();
 
 	Speed = FVector::DotProduct(forwardVector, velocity);
+
+	//좌우 이동
+	FVector rightVector = kratos->GetActorRightVector();
+	Direction = FVector::DotProduct(rightVector, velocity);
 }

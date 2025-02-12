@@ -129,7 +129,7 @@ void AKratosCharacter::Tick(float DeltaTime)
 }
 
 
-// Called to bind functionality to input
+// 입력 연결
 void AKratosCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -156,6 +156,17 @@ void AKratosCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		PlayerInput->BindAction(IA_Attack, ETriggerEvent::Started, this, &AKratosCharacter::AttackAction);
 		PlayerInput->BindAction(IA_Sheath_UnSheath, ETriggerEvent::Started, this , &AKratosCharacter::SheathAction);
 	}
+
+}
+
+// 크레토스 HP
+void AKratosCharacter::GetKratosHP()
+{
+
+}
+
+void AKratosCharacter::SetKratosHP()
+{
 
 }
 
@@ -433,6 +444,9 @@ void AKratosCharacter::SetCharacterState(EWOG_Character_State NewState)
 
 void AKratosCharacter::TakeKDamage(const FWOG_DamageEvent& DamageEvent , ICombatInterface* DamageCauser)
 {
+	FString logMsg = TEXT("Kratos Take Damage!");
+	GEngine->AddOnScreenDebugMessage(0 , 1 , FColor::Red , logMsg);
+	UE_LOG(LogTemp , Warning , TEXT("Kratos Take Damage!"));
 }
 
 USkeletalMeshComponent* AKratosCharacter::GetSkeletalMesh()

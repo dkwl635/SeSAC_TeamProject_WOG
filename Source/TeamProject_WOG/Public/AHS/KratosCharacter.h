@@ -71,10 +71,20 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = KratosState)
 	EKratosState mState = EKratosState::Idle;
 
+	//-------------------------------------------------------------------
 	// HP
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
-	float Health = 100.0f;
+	float MaxHealth = 100.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
+	float CurrentHealth = 0.0f;
+
+	void GetKratosHP();
+	void SetKratosHP();
+
+
+	
+	//-------------------------------------------------------------------
 	// 분노 게이지(Rage meter)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
 	float Rage = 100.0f;
@@ -94,11 +104,11 @@ public:
 	FVector Direction;
 
 	// 무기가 있는지 여부
-	UPROPERTY(EditDefaultsOnly, Category = PlayerSettings)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerSettings)
 	bool Kratos_HasWeapon = true;
 
 	// 무기 장착 여부
-	UPROPERTY(EditDefaultsOnly, Category = PlayerSettings)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerSettings)
 	bool Kratos_EquippedWeapon = false;
 
 	// 무기 장착 후, 에임 상태 진입
@@ -186,6 +196,10 @@ public:
 	// 근접 공격(주먹)
 	UPROPERTY(EditAnywhere, Category = AnimMontage)
 	UAnimMontage* Fist_Attack_Montage;
+
+	// 데미지받았을 때
+	UPROPERTY(EditAnywhere, Category = AnimMontage)
+	UAnimMontage* TakeDamage_Montage;
 
 
 //4. 도끼
