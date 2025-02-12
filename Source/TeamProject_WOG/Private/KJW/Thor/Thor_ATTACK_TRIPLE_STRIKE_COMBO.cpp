@@ -43,20 +43,25 @@ void UThor_ATTACK_TRIPLE_STRIKE_COMBO::NotifyEventPattern_C(int32 EventIndex)
 	}
 	else
 	{
-		Start =Owner->GetSkeletalMesh()->GetSocketLocation(TEXT("hand_r"));
+		Start = Owner->GetSkeletalMesh()->GetSocketLocation(TEXT("hand_r"));
 	}
 
 	// 구의 반경
 	float Radius = 30.f;
 	// 충돌 쿼리 파라미터
 	FCollisionQueryParams CollisionParams;
-	bool bHit = Owner->GetWorld()->SweepSingleByChannel(OutHit, Start, Start, FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(Radius), CollisionParams);
+	bool bHit = Owner->GetWorld()->SweepSingleByChannel(OutHit, Start, Start, FQuat::Identity, EWOGTraceChannel::EnemyAttackTrace, FCollisionShape::MakeSphere(Radius), CollisionParams);
 	
 	FColor SphereColor = bHit ? FColor::Red : FColor::Green;
 	DrawDebugSphere(Owner->GetWorld(), Start, Radius, 12, SphereColor, false, 1.0f, 0, 2.0f);
 
 	if (bHit)
 	{
+		FWOG_DamageEvent DamageData;
+		DamageData.DamageValue = 10;
+		DamageData.HitPoint = OutHit.ImpactPoint;
+		Owner->Target->TakeKDamage(DamageData , Owner);
+
 		UE_LOG(LogTemp, Warning, TEXT("충돌한 액터: %s"), *OutHit.GetActor()->GetName());
 	}
 	

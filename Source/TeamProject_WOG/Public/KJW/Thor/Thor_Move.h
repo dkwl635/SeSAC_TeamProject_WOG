@@ -30,8 +30,7 @@ public:
 	FVector MovePos = FVector::ZeroVector;
 	FVector Direction = FVector::ZeroVector;
 
-	UPROPERTY(EditAnywhere)
-	float MapSize = 1000.0f;
+	
 	
 	UPROPERTY(EditAnywhere)
 	float WalkSpeed = 300.0f;

@@ -6,6 +6,7 @@
 #include "UObject/Object.h"
 #include "TeamProject_WOG/TeamProject_WOG.h"
 #include "KJW/Thor.h"
+#include "AHS/KratosCharacter.h"
 #include "ThorPattern.generated.h"
 
 
@@ -38,7 +39,6 @@ protected:
     virtual void StartPattern_CBP(); 
     //C,BP 관련 스탑시 최종 스탑 함수
     virtual void StopPattern_CBP();
-   
     //C,BP 관련 종료시 최종 종료 함수
     //상속할시 마지막에 호출시켜 주시요
     virtual void EndPattern_CBP();
@@ -92,16 +92,29 @@ private:
      void NotifyEndPattrern_BP_Implementation(int32 EventIndex);
      void NotifyTickPattrern_BP_Implementation(int32 EventIndex, float FrameDeltaTime);
 
+
 protected:
     UPROPERTY(EditAnywhere)
     bool bHitable = false;
 
+    bool bEndPattern = true;
+
 public:
     bool IsHitable() { return bHitable; }
+    bool IsEndPattern() { return bEndPattern; }
+    virtual bool IsStartable(){ return true; }
 
 public:
     //특수한 값을 줄때 사용할 함수
     virtual void SetOptionValue(float Value_1 = 0, float Value_2 = 0, float Value_3 = 0);
 
+protected :
+    FVector MapPoint = FVector::ZeroVector;
+
+
+    float MapSize = 1000.0f;
+
+
+   
 };
 

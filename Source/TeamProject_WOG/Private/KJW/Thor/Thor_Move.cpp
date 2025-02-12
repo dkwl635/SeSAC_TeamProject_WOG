@@ -16,7 +16,7 @@ void UThor_Move::StartPattern_C()
 	Owner->SetIsMove(true);
 	UE_LOG(LogTemp, Warning, TEXT("StartPattern_C_MOVE"));
 
-	MovePos = Owner->GetMoveRandomPos(SpawnPos, MapSize, 400.f);
+	MovePos = Owner->GetMoveRandomPos(SpawnPos, 400.f);
 
 	Direction = MovePos - Owner->GetActorLocation();
 	Direction.Z = 0;

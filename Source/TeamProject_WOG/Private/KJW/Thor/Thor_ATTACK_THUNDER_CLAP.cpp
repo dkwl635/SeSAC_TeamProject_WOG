@@ -6,11 +6,9 @@
 
 void UThor_ATTACK_THUNDER_CLAP::StartPattern_CBP()
 {
-	Super::StartPattern_CBP();
-
 	bAttack = false;
 	float TargetDistance = Owner->GetDistanceTo(Owner->Target);
-	if ( TargetDistance < AttackRadius )
+	if ( TargetDistance < AttackRadius * 2.0f)
 	{
 		Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
 		bAttack = true;
@@ -41,6 +39,10 @@ void UThor_ATTACK_THUNDER_CLAP::NotifyEventPattern_C(int32 EventIndex)
 
 	if ( bHit )
 	{
+		FWOG_DamageEvent DamageData;
+		DamageData.DamageValue = 10;
+		DamageData.HitPoint = OutHit.ImpactPoint;
+		Owner->Target->TakeKDamage(DamageData , Owner);
 		UE_LOG(LogTemp , Warning , TEXT("충돌한 액터: %s") , *OutHit.GetActor()->GetName());
 	}
 }
