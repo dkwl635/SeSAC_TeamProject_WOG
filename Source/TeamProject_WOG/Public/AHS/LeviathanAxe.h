@@ -65,6 +65,15 @@ public:
     UPROPERTY(EditAnywhere)
     float MoveDuration = 1.0f; // 이동 시간
 
+	//----------------------------------------------------------------
+	// collision(충돌) 구현
+	UFUNCTION()
+	void OnAxeOverlap(UPrimitiveComponent* OverlappedComponent , 
+					  AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , 
+					  bool bFromSweep , const FHitResult& SweepResult);
+
+UFUNCTION(BlueprintCallable)
+	void OnAxeOverlapBP(  AActor* OtherActor   , FVector SweepResult);
 
 	
 };

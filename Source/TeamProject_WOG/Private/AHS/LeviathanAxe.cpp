@@ -6,6 +6,8 @@
 #include "AHS/KratosCharacter.h"
 #include "Camera/CameraComponent.h"
 
+#include "KJW/Thor.h"
+
 ALeviathanAxe::ALeviathanAxe()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -20,11 +22,15 @@ ALeviathanAxe::ALeviathanAxe()
 	bIsReturning = false;
 	bIsMoving = false;
 
+
+
 }
 
 void ALeviathanAxe::BeginPlay()
 {
 	Super::BeginPlay();
+
+	target = Cast<AKratosCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 }
 
 
@@ -158,4 +164,32 @@ void ALeviathanAxe::ReturnAxe(FVector StartLocation)
     ElapsedTime = 0.0f;
     bIsMoving = true;
     bIsReturning = true;
+}
+
+void ALeviathanAxe::OnAxeOverlap(UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult)
+{
+	AThor* thor = Cast<AThor>(OtherActor);
+	if ( thor != nullptr ) {
+		UE_LOG(LogTemp, Warning, TEXT("Thor"));
+
+		FWOG_DamageEvent DamageData;
+		DamageData.DamageValue = 10;
+		DamageData.HitPoint = SweepResult.ImpactPoint;
+
+		thor->TakeKDamage(DamageData, target);
+	}
+}
+
+void ALeviathanAxe::OnAxeOverlapBP(AActor* OtherActor , FVector SweepResult)
+{
+	AThor* thor = Cast<AThor>(OtherActor);
+	if ( thor != nullptr ) {
+		UE_LOG(LogTemp , Warning , TEXT("Thor"));
+
+		FWOG_DamageEvent DamageData;
+		DamageData.DamageValue = 10;
+		DamageData.HitPoint = SweepResult;
+
+		thor->TakeKDamage(DamageData , target);
+	}
 }
