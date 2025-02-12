@@ -24,7 +24,7 @@ void UThor_ATTACK_HAMMER_THROW_START::StartPattern_C()
 
 	bEndPattern = false;
 	//멀리 있을때
-	if (DisSize >= AttackRange)
+	if (DisSize >= AttackRange*0.9f)
 	{	
 		bEndPattern = true;
 		ParrtenIndex = 0;
@@ -190,7 +190,7 @@ void UThor_ATTACK_HAMMER_THROW_START::NotifyEventPattern_C(int32 EventIndex)
 			DamageData.HitPoint = OutHit.ImpactPoint;
 			Owner->Target->TakeKDamage(DamageData , Owner);
 			FVector PlayerVelocity = Owner->Target->GetActorForwardVector();
-			Owner->Target->GetCharacterMovement()->Velocity = PlayerVelocity * -1.0f * 50000.0f;
+			Owner->Target->GetCharacterMovement()->Velocity = PlayerVelocity * -1.0f * 20000.0f;
 		}
 
 	}
@@ -204,7 +204,8 @@ void UThor_ATTACK_HAMMER_THROW_START::NotifyEventPattern_C(int32 EventIndex)
 
 bool UThor_ATTACK_HAMMER_THROW_START::IsStartable()
 {
-	return !Owner->ThorHammer->IsHammerFly;
+	//현제 토르 해머가 땅에 없다면 사용가능
+	return !Owner->ThorHammer->IsGround;
 }
 
 void UThor_ATTACK_HAMMER_THROW_START::OnOverlapHammer()

@@ -108,3 +108,9 @@ void UThor_ATTACK_TRIPLE_STRIKE_COMBO::NotifyTickPattrern_C(int32 EventIndex, fl
 	}
 
 }
+
+bool UThor_ATTACK_TRIPLE_STRIKE_COMBO::IsStartable()
+{
+	//현제 토르 해머를 가지고 없다면
+	return !Owner->IsHammer;
+}

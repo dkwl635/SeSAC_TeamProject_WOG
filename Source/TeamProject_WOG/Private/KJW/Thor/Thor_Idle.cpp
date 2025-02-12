@@ -44,6 +44,6 @@ void UThor_Idle::TickPattern_CBP()
 void UThor_Idle::SetNextPattern()
 {
 	UE_LOG(LogTemp , Warning , TEXT("SetNextPattern"));
-	EndPattern();
+	//EndPattern();
 }
 

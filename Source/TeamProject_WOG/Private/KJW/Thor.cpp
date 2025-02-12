@@ -6,6 +6,7 @@
 #include "KJW/ThorAnimInstance.h"
 #include "KJW/ThorPattern.h"
 #include "KJW/Thor/Thor_Idle.h"
+#include "KJW/Thor/Thor_HIT.h"
 #include "KJW/ThorHammer.h"
 // Sets default values
 AThor::AThor()
@@ -114,6 +115,11 @@ void AThor::InitPatternClass()
 	UThorPattern* ThorIdlePattern = NewObject<UThorPattern>(this, IdlePatternClass);
 	ThorIdlePattern->InitPattern(this);
 	Patterns.Add(EThorPattern::IDLE, ThorIdlePattern);
+
+	UThorPattern* ThorHitPattern = NewObject<UThorPattern>(this , HitPatternClass);
+	ThorHitPattern->InitPattern(this);
+	Patterns.Add(EThorPattern::HIT , ThorHitPattern);
+
 
 	//PatternClass 생성후 TMap 넣기
 	for ( int32 i = 0; i < PatternClass.Num(); i++ )

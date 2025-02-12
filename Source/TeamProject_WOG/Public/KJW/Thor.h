@@ -68,8 +68,15 @@ public:
 	//Idle 상태는 필수로 가져가기 위해서
 	UPROPERTY(EditAnywhere , Category = PatternClass)
 	TSubclassOf<class UThor_Idle> IdlePatternClass;
+
+	UPROPERTY(EditAnywhere , Category = PatternClass)
+	TSubclassOf<class UThor_HIT> HitPatternClass;
+
 	UPROPERTY(EditAnywhere , Category = PatternClass)
 	TArray<TSubclassOf<class UThorPattern>> PatternClass;
+	
+
+	
 	void InitPatternClass();
 
 public:

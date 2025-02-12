@@ -31,5 +31,5 @@ public:
 	virtual bool TickPattern_C() override;
 	
 
-	virtual bool IsStartable() { return true; }
+	virtual bool IsStartable() override; //{ return true; }
 };

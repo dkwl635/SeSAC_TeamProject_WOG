@@ -21,6 +21,7 @@ protected:
 	virtual void NotifyEventPattern_C(int32 EventIndex) override;
 	virtual  void NotifyTickPattrern_C(int32 EventIndex , float FrameDeltaTime) override;
 
+	virtual bool IsStartable() override;// { return true; }
 public:
 	//공격 모션 몽타주
 	UPROPERTY(EditAnywhere)

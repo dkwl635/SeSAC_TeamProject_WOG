@@ -48,6 +48,6 @@ protected:
 	virtual void NotifyEndPattrern_C(int32 EventIndex) override;
 	virtual void NotifyTickPattrern_C(int32 EventIndex , float FrameDeltaTime) override;
 
-
+	virtual bool IsStartable() override;
 
 };

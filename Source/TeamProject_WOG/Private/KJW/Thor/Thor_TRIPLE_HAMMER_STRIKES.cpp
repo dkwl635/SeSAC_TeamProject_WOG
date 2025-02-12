@@ -102,3 +102,9 @@ void UThor_TRIPLE_HAMMER_STRIKES::NotifyTickPattrern_C(int32 EventIndex , float 
 
 
 }
+
+bool UThor_TRIPLE_HAMMER_STRIKES::IsStartable()
+{
+	//토르가 해머를 가지고 있다면 시작가능
+	return Owner->IsHammer;
+}
