@@ -23,6 +23,6 @@ protected:
 
 public:
 	float IdleTime;
-
+	virtual bool IsStartable() override { return false; } 
 
 };

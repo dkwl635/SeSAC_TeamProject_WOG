@@ -20,7 +20,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* FHitAnimMontage;
 
-
+	virtual bool IsStartable() override { return false; }
 protected:
 	virtual void StartPattern_CBP() override;
 

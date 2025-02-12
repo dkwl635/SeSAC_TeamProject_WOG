@@ -94,7 +94,8 @@ private:
 	UPROPERTY()
 	TMap<EThorPattern , class UThorPattern*> Patterns;
 	class UThorPattern* GetPattern(EThorPattern Pattern);
-	
+public:
+	TMap<EThorPattern , class UThorPattern*>& GetPattern(){ return Patterns; }
 //애님 노티파이 블루프린트에서 호출하는
 	UFUNCTION(BlueprintCallable)
 	void NotifyEventPattern(int32 EventIndex);

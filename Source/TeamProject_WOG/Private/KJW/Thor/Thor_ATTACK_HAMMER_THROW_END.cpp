@@ -68,5 +68,5 @@ bool UThor_ATTACK_HAMMER_THROW_END::TickPattern_C()
 bool UThor_ATTACK_HAMMER_THROW_END::IsStartable()
 {
 	//현제 토르 해머가 땅에 있으면 패턴 변경 가능
-	return Owner->ThorHammer->IsGround;
+	return !Owner->IsHammer;
 }

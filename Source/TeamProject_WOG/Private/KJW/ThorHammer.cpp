@@ -39,8 +39,9 @@ void AThorHammer::HammerFly(FVector Direction)
 
 void AThorHammer::StartHammerFly(FVector Direction)
 {
-	IsGround = false;
+	
 
+	IsGround = false;
 	//날아가는 2초동안 날아가게
 	HammerFly(Direction);
 	IsHammerFly = true;

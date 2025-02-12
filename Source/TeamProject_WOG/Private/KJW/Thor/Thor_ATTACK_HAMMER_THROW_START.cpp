@@ -204,8 +204,8 @@ void UThor_ATTACK_HAMMER_THROW_START::NotifyEventPattern_C(int32 EventIndex)
 
 bool UThor_ATTACK_HAMMER_THROW_START::IsStartable()
 {
-	//현제 토르 해머가 땅에 없다면 사용가능
-	return !Owner->ThorHammer->IsGround;
+	//현제 토르 해머를 가지고 있다면
+	return Owner->IsHammer;
 }
 
 void UThor_ATTACK_HAMMER_THROW_START::OnOverlapHammer()

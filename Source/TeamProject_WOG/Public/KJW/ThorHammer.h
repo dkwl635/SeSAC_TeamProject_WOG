@@ -58,6 +58,7 @@ public:
 public:
 	UPROPERTY()
 	class AThor* Thor;
+private:
 	bool IsGround = false;
 
 };

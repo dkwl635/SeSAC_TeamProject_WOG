@@ -32,8 +32,7 @@ void AThor::BeginPlay()
 
 	ThorAnimIns = Cast<UThorAnimInstance>(GetSkeletalMesh()->GetAnimInstance());
 	ThorAnimIns->OnMontageEnded.AddDynamic(this , &ThisClass::OnMontageEnded);
-	InitPatternClass();
-
+	
 	Target = Cast<AKratosCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	if ( Target ) { UE_LOG(LogTemp , Warning , TEXT("Is Target")); }
 
@@ -44,6 +43,8 @@ void AThor::BeginPlay()
 	}
 	
 	ThorHammer->Thor = this;
+
+	InitPatternClass();
 }
 
 // Called every frame
@@ -165,6 +166,7 @@ void AThor::StartPattarn(EThorPattern NewPattern)
 	UThorPattern* Start = GetPattern(NewPattern);
 	if (!Start) return;
 
+	
 	Start->StartPattern();
 	CurPattern = Start;
 }
