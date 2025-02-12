@@ -39,16 +39,32 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* MeshComp;
 
+	//---------------------------------------------------------------
 	// 도끼 던지기 이동 구현
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Axe)
 	EAxeState mState = EAxeState::Default;
 
+	//애니메이션
 	void DefaultState();
 	void ThrowState();
 
 	// 타겟
 	UPROPERTY(VisibleAnywhere, Category = FSM)
 	class AKratosCharacter* target;
+	//----------------------------------------------------------------
+	// 실제 이동 구현
+	void ThrowAxe(FVector TargetLocation);
+	void ReturnAxe(FVector StartLocation);
+
+	FVector StartPos;
+    FVector EndPos;
+    float ElapsedTime;
+    bool bIsReturning;
+    bool bIsMoving;
+
+    UPROPERTY(EditAnywhere)
+    float MoveDuration = 1.0f; // 이동 시간
+
 
 	
 };
