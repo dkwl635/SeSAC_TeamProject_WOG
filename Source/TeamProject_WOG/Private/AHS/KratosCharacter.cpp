@@ -77,6 +77,9 @@ void AKratosCharacter::BeginPlay()
 	//2. Aim UI
 	AimAxeUI = CreateWidget(GetWorld(), AimAxeUIFactory);
 
+	//3. Anim Notify 구현
+	GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.AddDynamic(this, &AKratosCharacter::AxeComboNotify);
+
 }
 
 // Called every frame
@@ -187,7 +190,7 @@ void AKratosCharacter::LookUp(const FInputActionValue& inputValue)
 	// 새로운 Pitch 값을 계산
 	float NewPitch = CurrentPitch + AdjustedValue;
 
-	// -60도에서 60도까지 제한
+	// 0도에서 30도까지 제한
 	if ( NewPitch < 0.0f )
 	{
 		NewPitch = 0.0f;
@@ -271,9 +274,7 @@ void AKratosCharacter::IsAiming(bool bIsAiming)
 	AimAttackState = bIsAiming;
 }
 
-
-
-
+//--------------------------------------------------------
 // 던진 무기 돌려받기
 void AKratosCharacter::ReturnAxetoHand(const FInputActionValue& inputValue)
 {
@@ -315,6 +316,7 @@ bool AKratosCharacter::Get_KratosEquippedWeapon() const
 	return Kratos_EquippedWeapon;
 }
 
+//--------------------------------------------------------
 // 공격
 void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 {
@@ -348,10 +350,20 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 			}
 			// 근거리 공격(도끼)
 			else {
+				UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+				
+				// 현재 콤보 몬타주를 재생하고 있지 않다면,
+				if ( !( AnimInstance->Montage_IsPlaying(AxeCombo_Montage) ) ) {
+					AnimInstance->Montage_Play(AxeCombo_Montage);
+					
+				}
+				
+				
+
 				ClickOnce = true;
 
-				UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-				AnimInstance->Montage_Play(Melee_Attack_Montage);
+				//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+				//AnimInstance->Montage_Play(Melee_Attack_Montage);
 			}
 		}
 		// 주먹 공격을 한다.
@@ -359,8 +371,8 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 
 			ClickOnce = true;
 
-			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-			AnimInstance->Montage_Play(Fist_Attack_Montage);			
+			//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			//AnimInstance->Montage_Play(Fist_Attack_Montage);			
 		}
 	}
 	else {
@@ -374,9 +386,15 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 }
 
 
+void AKratosCharacter::AxeComboNotify(FName AxeCombo , const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
+{
+	FString logMsg = TEXT("Kratos Axe Notify!");
+	GEngine->AddOnScreenDebugMessage(0 , 1 , FColor::Red , logMsg);
+}
 
 
 
+//----------------------------------------------------------------------------------
 FVector AKratosCharacter::GetAimLocation()
 {
 	FVector StartPos = KratosCamComp->GetComponentLocation();
@@ -391,7 +409,7 @@ FVector AKratosCharacter::GetAimLocation()
 	return bHit ? HitInfo.ImpactPoint : EndPos;
 }
 
-
+//-----------------------------------------------------------------------------------
 // 원거리 무기 공격
 // 도끼 던지기
 void AKratosCharacter::ThrowAxe()
@@ -429,8 +447,8 @@ void AKratosCharacter::RecallAxe()
 }
 
 //----------------------------------------------------------------------------------
-
-void AKratosCharacter::OnLeftHandOverlapBP(AActor* OtherActor , FVector SweepResult)
+// 충돌 처리(Collision)
+void AKratosCharacter::OnHandOverlapBP(AActor* OtherActor , FVector SweepResult)
 {
 	AThor* thor = Cast<AThor>(OtherActor);
 	if ( thor != nullptr ) {
@@ -443,6 +461,7 @@ void AKratosCharacter::OnLeftHandOverlapBP(AActor* OtherActor , FVector SweepRes
 		thor->TakeKDamage(DamageData , this);
 	}
 }
+
 
 //--------------------------------------------------------------------------------------
 // 공통 데미지 주고 받기

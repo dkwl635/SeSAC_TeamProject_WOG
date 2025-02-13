@@ -9,6 +9,7 @@
 #include "CombatInterface.h"
 
 #include "TeamProject_WOG/TeamProject_WOG.h"
+#include "Animation/AnimNotifies/AnimNotify.h"
 
 #include "KratosCharacter.generated.h"
 
@@ -251,7 +252,15 @@ public:
 
 //2/12(수) 주먹 공격 Collision 구현
 	UFUNCTION(BlueprintCallable)
-	void OnLeftHandOverlapBP(  AActor* OtherActor   , FVector SweepResult);
+	void OnHandOverlapBP(  AActor* OtherActor   , FVector SweepResult);
+
+//2/13(목) BP 구현된 기능들 C++로 옮겨오기
+	//01) 콤보 공격(도끼)
+	UPROPERTY(EditAnywhere, Category = AnimMontage)
+	UAnimMontage* AxeCombo_Montage;
+
+	UFUNCTION()
+	void AxeComboNotify(FName AxeCombo, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 
 
 
