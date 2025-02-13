@@ -19,6 +19,9 @@ public:
 	//전방 Hit 몽타주
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* FHitAnimMontage;
+
+	UPROPERTY(EditDefaultsOnly)
+	TArray<UAnimMontage*> HitAnimMontages;
 public:
 	virtual void InitPattern(class AThor* Thor) override;
 	virtual bool IsStartable() override { return false; }

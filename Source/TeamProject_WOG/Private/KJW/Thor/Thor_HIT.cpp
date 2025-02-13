@@ -21,7 +21,10 @@ void UThor_HIT::EndPattern_CBP()
 
 void UThor_HIT::StartPattern_CBP()
 {
-	Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Play(FHitAnimMontage);
+
+
+	//Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Play(FHitAnimMontage);
+	Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Play(HitAnimMontages[HitCount]);
 	bHitable = true;
 
 	HitCount++;
