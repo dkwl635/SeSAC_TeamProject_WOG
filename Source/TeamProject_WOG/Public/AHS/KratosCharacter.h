@@ -101,8 +101,19 @@ public:
 	UPROPERTY(EditAnywhere , Category = PlayerSettings)
 	float WalkSpeed = 600.0f;
 
+	UPROPERTY(EditAnywhere , Category = PlayerSettings)
+	float RunSpeed = 800.0f;
+
 	// 이동 방향
 	FVector Direction;
+
+	// 무기(도끼) --> 손에 붙어 있는 것.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Axe)
+	class UStaticMeshComponent* AxeMesh;
+
+	// 무기 충돌 처리
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Axe)
+	class UBoxComponent* AxeCollision;
 
 	// 무기가 있는지 여부
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerSettings)
@@ -262,8 +273,26 @@ public:
 	UFUNCTION()
 	void AxeComboNotify(FName AxeCombo, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 
+	//주먹 Collision 켜기/끄기
+	void FistCollision(bool bValue);
 
+	// 무기 Collision 켜기/끄기
+	void OnAxeCollision(bool bValue);
 
+	// Dash 기능 추가
+	UPROPERTY( EditDefaultsOnly , Category = "Input" )
+	class UInputAction* IA_Dash;
+
+	void DashInput();
+
+	// Main UI 추가
+	UPROPERTY(EditDefaultsOnly, Category = AimAxeUI)
+	TSubclassOf<class UUserWidget> MainUIFactory;
+
+	// Main UI 위젯 인스턴스
+	UPROPERTY()
+	class UUserWidget* MainUI;
+	
 
 
 	//-------------------------------------------------------------------
