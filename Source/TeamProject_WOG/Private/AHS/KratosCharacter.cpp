@@ -103,7 +103,7 @@ void AKratosCharacter::BeginPlay()
 	MainUI->AddToViewport();
 
 	//3. Anim Notify 구현
-	GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.AddDynamic(this, &AKratosCharacter::AxeComboNotify);
+	//GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.AddDynamic(this, &AKratosCharacter::AxeComboNotify);
 
 	//4. 주먹 Collider 꺼두기
 	FistCollision(false);
@@ -507,7 +507,7 @@ void AKratosCharacter::RecallAxe()
 // 충돌 처리(Collision)
 void AKratosCharacter::OnHandOverlapBP(AActor* OtherActor , FVector SweepResult)
 {
-	FistCollision(true);
+	FistCollision(false);
 
 	AThor* thor = Cast<AThor>(OtherActor);
 	if ( thor != nullptr ) {

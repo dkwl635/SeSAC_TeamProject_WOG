@@ -103,6 +103,8 @@ void AThor::TakeKDamage( const FWOG_DamageEvent& DamageEvent, ICombatInterface* 
 	{
 		GEngine->AddOnScreenDebugMessage(-1 , 5.0f , FColor::Red , FString::Printf(TEXT("Thor : Damage Value: %f") , DamageValue));
 	}
+
+	IsHit = true;
 }
 
 USkeletalMeshComponent* AThor::GetSkeletalMesh()

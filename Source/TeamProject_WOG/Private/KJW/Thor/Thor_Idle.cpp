@@ -30,6 +30,8 @@ void UThor_Idle::TickPattern_CBP()
 	EndRot = UKismetMathLibrary::RLerp(StartRot , EndRot , Delta , bShortestPath);
 	Owner->SetActorRotation(EndRot);
 
+	if ( !IsAI ) { return; }
+
 	if ( IdleTime > 0 )
 	{
 		IdleTime -= Owner->GetWorld()->GetDeltaSeconds();
@@ -43,7 +45,7 @@ void UThor_Idle::TickPattern_CBP()
 
 void UThor_Idle::SetNextPattern()
 {
-	if ( !IsAI ) { return; }
+	
 
 	UE_LOG(LogTemp , Warning , TEXT("SetNextPattern"));
 
@@ -88,11 +90,13 @@ void UThor_Idle::SetNextPattern()
 
 bool UThor_Idle::IsHitable()
 {
-	if ( IdleTime < 0.32f )
+	if ( IsAI )
 	{
-		return false;
+		if ( IdleTime < 0.32f )
+		{
+			return false;
+		}
 	}
-
 	return bHitable;
 }
 

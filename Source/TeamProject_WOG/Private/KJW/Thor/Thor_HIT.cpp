@@ -14,7 +14,7 @@ void UThor_HIT::EndPattern_CBP()
 	bHitable = true;
 	IdleTime = 0.3f;
 	
-	Owner->GetPattern(EThorPattern::IDLE)->SetOptionValue(IdleTime , false);
+	Owner->GetPattern(EThorPattern::IDLE)->SetOptionValue(IdleTime , bHitable);
 	Owner->StartPattarn(EThorPattern::IDLE);
 	//Super::EndPattern_CBP();
 }
