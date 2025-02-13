@@ -13,6 +13,11 @@
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimInstance.h"
 #include "Components/SphereComponent.h"
+#include "KJW/Thor.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "CombatInterface.h"
+#include "Components/StaticMeshComponent.h"
+#include "Components/BoxComponent.h"
 
 
 
@@ -45,25 +50,36 @@ AKratosCharacter::AKratosCharacter()
 	AxeSpawnPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("AxeSpawnPoint"));
 	AxeSpawnPoint->SetupAttachment(RootComponent);
 
+	// 손에 붙일 도끼 만들기
+	AxeMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AxeMesh"));
+
+	AxeMesh->SetupAttachment(GetMesh(), TEXT("Unarmmed"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> TempAxeMesh(TEXT("/Script/Engine.StaticMesh'/Game/AHS/Assets/Leviathan_Axe/Axe.Axe'"));
+	if ( TempAxeMesh.Succeeded() ) {
+		AxeMesh->SetStaticMesh(TempAxeMesh.Object);
+	}
+	AxeMesh->SetRelativeScale3D(FVector(0.14f));
+
+	// 도끼 충돌 처리 해보자.
+	AxeCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("AxeCollision"));
+	AxeCollision->SetupAttachment(AxeMesh);
+	AxeCollision->SetCollisionProfileName(TEXT("PlayerAttack"));
+	
+	AxeCollision->SetRelativeLocation(FVector(0.0f, 0.0f, 30.0f));
+	AxeCollision->SetRelativeScale3D(FVector(0.3f, 0.15f, 0.25f));
+	
+	//------------------------------------------------------------
 	// 3. 주먹 콜리전 구현
 	Fist_R = CreateDefaultSubobject<USphereComponent>(TEXT("Fist_R"));
 	Fist_R->SetRelativeScale3D(FVector(0.05f));
-	Fist_R->SetupAttachment(GetMesh());
-
-	//Fist_R->SetupAttachment(GetMesh()->GetSocketByName("RightHand"));
+	Fist_R->SetupAttachment(GetMesh() , FName(TEXT("Hand_R")));
+	Fist_R->SetCollisionProfileName(TEXT("PlayerAttack"));
+	
 
 	Fist_L = CreateDefaultSubobject<USphereComponent>(TEXT("Fist_L"));
 	Fist_L->SetRelativeScale3D(FVector(0.05f));
-	Fist_L->SetupAttachment(GetMesh());
-
-	/*
-	if ( GetMesh() && GetMesh()->DoesSocketExist("Armmed") )
-	{
-		SpawnLocation = GetMesh()->GetSocketLocation("Armmed");
-	}
-	*/
-
-
+	Fist_L->SetupAttachment(GetMesh(), FName(TEXT("Hand_L")));
+	Fist_L->SetCollisionProfileName(TEXT("PlayerAttack"));
 }
 
 // Called when the game starts or when spawned
@@ -81,8 +97,17 @@ void AKratosCharacter::BeginPlay()
 		}
 	}
 
-	//2. Aim UI
+	//2. Aim UI + Main UI
 	AimAxeUI = CreateWidget(GetWorld(), AimAxeUIFactory);
+	MainUI = CreateWidget(GetWorld(), MainUIFactory);
+	MainUI->AddToViewport();
+
+	//3. Anim Notify 구현
+	GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.AddDynamic(this, &AKratosCharacter::AxeComboNotify);
+
+	//4. 주먹 Collider 꺼두기
+	FistCollision(false);
+	OnAxeCollision(false);
 
 }
 
@@ -116,6 +141,8 @@ void AKratosCharacter::Tick(float DeltaTime)
 				mState = EKratosState::Idle;
 				currentTime = 0.0f;
 				ClickOnce = false;
+				FistCollision(false);
+				OnAxeCollision(false);
 			}
 		
 		} break;
@@ -143,6 +170,10 @@ void AKratosCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		PlayerInput->BindAction(IA_Turn , ETriggerEvent::Triggered , this , &AKratosCharacter::Turn);
 		PlayerInput->BindAction(IA_LookUp , ETriggerEvent::Triggered , this , &AKratosCharacter::LookUp);
 		PlayerInput->BindAction(IA_Move , ETriggerEvent::Triggered , this , &AKratosCharacter::Move);
+
+		//대쉬
+		PlayerInput->BindAction(IA_Dash , ETriggerEvent::Started , this , &AKratosCharacter::DashInput);
+		PlayerInput->BindAction(IA_Dash , ETriggerEvent::Completed , this , &AKratosCharacter::DashInput);
 
 		// 2. 플레이어 공격 및 무기 장착
 		// 2-1. 플레이어 에임
@@ -194,7 +225,7 @@ void AKratosCharacter::LookUp(const FInputActionValue& inputValue)
 	// 새로운 Pitch 값을 계산
 	float NewPitch = CurrentPitch + AdjustedValue;
 
-	// -60도에서 60도까지 제한
+	// 0도에서 30도까지 제한
 	if ( NewPitch < 0.0f )
 	{
 		NewPitch = 0.0f;
@@ -278,9 +309,7 @@ void AKratosCharacter::IsAiming(bool bIsAiming)
 	AimAttackState = bIsAiming;
 }
 
-
-
-
+//--------------------------------------------------------
 // 던진 무기 돌려받기
 void AKratosCharacter::ReturnAxetoHand(const FInputActionValue& inputValue)
 {
@@ -322,14 +351,17 @@ bool AKratosCharacter::Get_KratosEquippedWeapon() const
 	return Kratos_EquippedWeapon;
 }
 
+//--------------------------------------------------------
 // 공격
 void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 {
 	mState = EKratosState::Attack;
 
+	/*
 	if ( ClickOnce == true ) {
 		return;
 	}
+	*/
 
 	//무기가 있다.
 	if ( Kratos_HasWeapon == true ) {
@@ -355,35 +387,71 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 			}
 			// 근거리 공격(도끼)
 			else {
+
+				/*
+				UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+				
+				// 현재 콤보 몬타주를 재생하고 있지 않다면,
+				
+				if ( !( AnimInstance->Montage_IsPlaying(AxeCombo_Montage) ) ) {
+					AnimInstance->Montage_Play(AxeCombo_Montage);
+					
+				}
+				*/
+				
+				
+				OnAxeCollision(true);
 				ClickOnce = true;
 
-				UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-				AnimInstance->Montage_Play(Melee_Attack_Montage);
+				//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+				//AnimInstance->Montage_Play(Melee_Attack_Montage);
 			}
 		}
 		// 주먹 공격을 한다.
 		else {
-
+			FistCollision(true);
 			ClickOnce = true;
 
-			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-			AnimInstance->Montage_Play(Fist_Attack_Montage);			
+			//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			//AnimInstance->Montage_Play(Fist_Attack_Montage);			
 		}
 	}
 	else {
-
+		FistCollision(true);
 		ClickOnce = true;
 
 		// 일반 주먹 공격
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		AnimInstance->Montage_Play(Fist_Attack_Montage);
+		//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		//AnimInstance->Montage_Play(Fist_Attack_Montage);
 	}
 }
 
+void AKratosCharacter::FistCollision(bool bValue)
+{
+	//Collision 켜기
+	if ( bValue ) {
+		Fist_R->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		Fist_L->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+	//Collision 끄기
+	else {
+		Fist_R->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Fist_L->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
 
+void AKratosCharacter::OnAxeCollision(bool bValue)
+{
+	if ( bValue ) {
+		AxeCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+	//Collision 끄기
+	else {
+		AxeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
 
-
-
+//----------------------------------------------------------------------------------
 FVector AKratosCharacter::GetAimLocation()
 {
 	FVector StartPos = KratosCamComp->GetComponentLocation();
@@ -398,7 +466,7 @@ FVector AKratosCharacter::GetAimLocation()
 	return bHit ? HitInfo.ImpactPoint : EndPos;
 }
 
-
+//-----------------------------------------------------------------------------------
 // 원거리 무기 공격
 // 도끼 던지기
 void AKratosCharacter::ThrowAxe()
@@ -435,6 +503,47 @@ void AKratosCharacter::RecallAxe()
 	}
 }
 
+//----------------------------------------------------------------------------------
+// 충돌 처리(Collision)
+void AKratosCharacter::OnHandOverlapBP(AActor* OtherActor , FVector SweepResult)
+{
+	FistCollision(true);
+
+	AThor* thor = Cast<AThor>(OtherActor);
+	if ( thor != nullptr ) {
+		FString logMsg = TEXT("Thor Take Damage!");
+		GEngine->AddOnScreenDebugMessage(0 , 1 , FColor::Red , logMsg);
+
+		UE_LOG(LogTemp , Warning , TEXT("Thor"));
+
+		FWOG_DamageEvent DamageData;
+		DamageData.DamageValue = 10;
+		DamageData.HitPoint = SweepResult;
+
+		thor->TakeKDamage(DamageData , this);
+	}
+}
+
+
+void AKratosCharacter::DashInput()
+{
+		auto movement = GetCharacterMovement();
+		if ( movement == nullptr ) {
+			return;
+		}
+
+		// 현재 달리기 모드라면,
+		if ( movement->MaxWalkSpeed > WalkSpeed ) {
+			//걷기 모드로 바꾼다.
+			movement->MaxWalkSpeed = WalkSpeed;
+		}
+		// 걷기 모드라면
+		else {
+			//달리기 모드로 바꾼다.
+			movement->MaxWalkSpeed = RunSpeed;
+		}
+}
+
 //--------------------------------------------------------------------------------------
 // 공통 데미지 주고 받기
 void AKratosCharacter::SetCharacterState(EWOG_Character_State NewState)
@@ -458,5 +567,16 @@ AActor* AKratosCharacter::GetActor()
 {
 	return this;
 }
+
+//=======================================================================
+//WIP
+
+void AKratosCharacter::AxeComboNotify(FName AxeCombo , const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
+{
+	FString logMsg = TEXT("Kratos Axe Notify!");
+	GEngine->AddOnScreenDebugMessage(0 , 1 , FColor::Red , logMsg);
+}
+
+
 
 
