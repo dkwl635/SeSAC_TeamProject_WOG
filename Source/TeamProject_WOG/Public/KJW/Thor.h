@@ -61,9 +61,10 @@ public:
 	virtual AActor* GetActor() override { return this; };
 	
 	void TestDamageEvnet(AActor* DamageTarget);
+	
+	bool IsHit = false;
 
 //토르 패턴 컨트롤
-
 public:
 	//Idle 상태는 필수로 가져가기 위해서
 	UPROPERTY(EditAnywhere , Category = PatternClass)
@@ -93,6 +94,7 @@ private:
 	class UThorPattern* CurPattern;
 	UPROPERTY()
 	TMap<EThorPattern , class UThorPattern*> Patterns;
+public:
 	class UThorPattern* GetPattern(EThorPattern Pattern);
 public:
 	TMap<EThorPattern , class UThorPattern*>& GetPattern(){ return Patterns; }
@@ -135,4 +137,9 @@ public:
 	//맵 사이즈
 	UPROPERTY(EditDefaultsOnly)
 	float MapSize = 3000.f;
+
+	public:
+		//임시 데미지 이벤트 호출
+		UFUNCTION(BlueprintCallable)
+		void TestKDamaged();
 };

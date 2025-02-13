@@ -18,6 +18,10 @@ void UThor_TRIPLE_LIGHTING_STRIKES::InitPattern(AThor* Thor)
 
 void UThor_TRIPLE_LIGHTING_STRIKES::StartPattern_CBP()
 {
+	//시작시 히트 상태 전환불가
+	bHitable = false;
+
+
 	Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
 	LightingSpawnCount = 0;
 	LightingShowCount = 0;
@@ -30,6 +34,8 @@ void UThor_TRIPLE_LIGHTING_STRIKES::NotifyEventPattern_C(int32 EventIndex)
 {
 	ThorLightings[LightingShowCount]->SpawnLighting();
 	LightingShowCount++;
+
+		
 }
 
 void UThor_TRIPLE_LIGHTING_STRIKES::SpawnLightings()

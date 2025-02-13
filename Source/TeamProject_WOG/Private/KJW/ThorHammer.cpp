@@ -94,10 +94,6 @@ void AThorHammer::HammerDown()
 	//바닥에 닿았을 때 Z 좌표 비교
 	if ( CurPos.Z <10.0f )
 	{
-		//물리 off
-		SphereComp->SetSimulatePhysics(false);
-		IsGround = true;
-		SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		//타임헨들 클리어
 		if ( FlyDownTimerHandle.IsValid() )
 		{
@@ -109,18 +105,9 @@ void AThorHammer::HammerDown()
 	{
 
 		FVector NewPos = GetActorLocation();
-		//NewPos += MoveSpeed * FlyDirection * 0.02f;
 		NewPos += MoveSpeed* 0.5f * GetActorForwardVector() * 0.02f;
 		SetActorLocation(NewPos);
 
-		//// 아래쪽으로 향하게
-		//FRotator TargetRotation = FRotationMatrix::MakeFromZ(FVector::DownVector).Rotator();
-		//// 현재 회전 가져오기
-		//FRotator CurrentRotation = GetActorRotation();
-		//// 부드럽게 보간하여 회전 적용
-		//FRotator NewRotation = FMath::RInterpTo(CurrentRotation , TargetRotation , DeltaTime , 2.0f);
-		//SetActorRotation(NewRotation);
-		
 	}
 
 }
@@ -137,14 +124,11 @@ void AThorHammer::OverlapHammer(UPrimitiveComponent* OverlappedComponent , AActo
 		//가야하는 땅 좌표
 		FVector GroundVector = OtherActor->GetActorLocation();
 		GroundVector.Z = 0;
-
 		GroundVector += player->GetActorForwardVector() * 400.0f;
-	
 		FVector NewDir = ( GroundVector - GetActorLocation() ).GetSafeNormal();
 		FRotator rot = NewDir.Rotation();
+		//머리 회전
 		SetActorRotation(rot);
-
-	
 		GetWorldTimerManager().SetTimer(FlyDownTimerHandle , this , &ThisClass::HammerDown , 0.02f , true , 0.0f);
 
 		if ( Thor )

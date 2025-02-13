@@ -43,33 +43,66 @@ void UThor_Idle::TickPattern_CBP()
 
 void UThor_Idle::SetNextPattern()
 {
+	if ( !IsAI ) { return; }
+
 	UE_LOG(LogTemp , Warning , TEXT("SetNextPattern"));
 
 	EThorPattern newPattern = EThorPattern::NONE;
 	
 	//1 패턴중 시작 가능한 패턴 가져오기
 	TMap<EThorPattern , UThorPattern*>& patterns = Owner->GetPattern();
-	
+	int32 rate = 0;
 	TArray<UThorPattern*> StartablePattern;
 	for ( auto pair : patterns )
 	{
 		if ( pair.Value->IsStartable() )
 		{
 			StartablePattern.Add(pair.Value);
+			rate += pair.Value->CurPatternRate;
 		}
 	}
 
-	//2 시작가능한 패턴 중 무작위 패턴 실행
-	int32 RandIndex = FMath::RandRange(0 , StartablePattern.Num() -1);
-	newPattern = StartablePattern[RandIndex]->ThorPattern;
+
+	//2 시작가능한 패턴 중 rate를 
+	int32 randRate = FMath::RandRange(1 , rate);
+	int32 accumulatedRate = 0;
+	for ( UThorPattern* pattern : StartablePattern )
+	{
+		accumulatedRate += pattern->CurPatternRate;
+
+		if ( randRate <= accumulatedRate )
+		{
+			newPattern = pattern->ThorPattern;
+			break;
+		}
+	}
+
 
 	if ( newPattern != EThorPattern::NONE )
 	{
-		UE_LOG(LogTemp , Warning , TEXT("%s") , *StartablePattern[RandIndex]->GetName());
-
 		Owner->StartPattarn(newPattern);
 	}
 
 	//EndPattern();
+}
+
+bool UThor_Idle::IsHitable()
+{
+	if ( IdleTime < 0.32f )
+	{
+		return false;
+	}
+
+	return bHitable;
+}
+
+void UThor_Idle::SetOptionValue(float Value_1, float Value_2, float Value_3)
+{
+	//다음 패턴 대기 시간 지정
+	IdleTime = Value_1;
+	//다음 패턴 실행까지 히트 애니메이션이 가능한지
+	bHitable = Value_2 > 0 ? true : false;
+	//임시
+	//bHitable = true;
 }
 

@@ -5,6 +5,9 @@
 
 void UThor_TRIPLE_HAMMER_STRIKES::StartPattern_CBP()
 {
+	//시작시 히트 상태 전환불가
+	bHitable = false;
+
 	UE_LOG(LogTemp , Warning , TEXT("Attack_StartPattern_C"));
 	bAttack = false;
 	float TargetDistance = Owner->GetDistanceTo(Owner->Target);
@@ -41,6 +44,9 @@ void UThor_TRIPLE_HAMMER_STRIKES::NotifyEventPattern_C(int32 EventIndex)
 		Owner->Target->TakeKDamage(DamageData , Owner);
 		UE_LOG(LogTemp , Warning , TEXT("충돌한 액터: %s") , *OutHit.GetActor()->GetName());
 	}
+
+	//첫 이벤트 이후 히트 상태 전환가능
+	bHitable = true;
 
 }
 

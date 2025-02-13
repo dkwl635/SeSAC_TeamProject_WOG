@@ -45,6 +45,9 @@ void AThor::BeginPlay()
 	ThorHammer->Thor = this;
 
 	InitPatternClass();
+	//토르 맵 판단크기
+	DrawDebugSphere(GetWorld() , GetActorLocation() , MapSize , 12 , FColor::Blue , false , 15.0f , 0);
+
 }
 
 // Called every frame
@@ -56,6 +59,21 @@ void AThor::Tick(float DeltaTime)
 	if ( CurPattern )
 	{
 		CurPattern->TickPattern();
+	}
+
+	//만약 데미지를 받은 상태 라면
+	if ( IsHit )
+	{
+		if ( CurPattern )
+		{
+			//현재 패턴에서 HIT상태로 변환가능한지
+			if ( CurPattern->IsHitable() && GetPattern(EThorPattern::HIT)->IsHitable())
+			{
+				//CurPattern->StopPattern();
+				StartPattarn(EThorPattern::HIT);
+			}
+		}
+		IsHit = false;
 	}
 }
 
@@ -221,7 +239,7 @@ void AThor::OnMontageEnded(UAnimMontage* Montage , bool bInterrupted)
 	{
 		if ( Montage->bLoop ) { return; }
 		UE_LOG(LogTemp , Warning , TEXT("몽타주가 강제 종료됨!"));
-		//CurPattern->StopPattern();
+		
 	}
 	else
 	{
@@ -258,6 +276,11 @@ void AThor::ShowHammer(bool bShow)
 	IsHammer = bShow;
 	
 	HammerComp->SetVisibility(bShow);
+}
+
+void AThor::TestKDamaged()
+{
+	IsHit = true;
 }
 
 

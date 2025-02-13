@@ -16,6 +16,12 @@ void UThorPattern::InitPattern(AThor* Thor)
 
 void UThorPattern::StartPattern()
 {
+	CurPatternRate -= MinusRate;
+	if ( CurPatternRate <= 0 )
+	{
+		CurPatternRate = DefaultPatternRate;
+	}
+
 	StartPattern_C();
 	StartPattern_BP();
 	StartPattern_CBP();
@@ -75,6 +81,7 @@ void UThorPattern::NotifyTickPattrern(int32 EventIndex , float FrameDeltaTime)
 
 void UThorPattern::StartPattern_CBP()
 {
+	
 }
 
 void UThorPattern::StopPattern_CBP()
@@ -84,6 +91,8 @@ void UThorPattern::StopPattern_CBP()
 void UThorPattern::EndPattern_CBP()
 {
 	//End Pattern CBP
+	Owner->SetIdleTimer(IdleTime);
+	Owner->GetPattern(EThorPattern::IDLE)->SetOptionValue(IdleTime , bHitable == true ? 1 : -1);
 	Owner->StartPattarn(EThorPattern::IDLE);
 }
 
@@ -93,6 +102,8 @@ void UThorPattern::TickPattern_CBP()
 
 void UThorPattern::StartPattern_C()
 {
+	
+
 }
 
 void UThorPattern::StopPattern_C()

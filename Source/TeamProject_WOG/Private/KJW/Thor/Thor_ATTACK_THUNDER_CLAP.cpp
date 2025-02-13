@@ -5,7 +5,10 @@
 
 
 void UThor_ATTACK_THUNDER_CLAP::StartPattern_CBP()
-{
+{	
+	//패턴시작시 히트 상태 전환불가
+	bHitable = false;
+
 	bAttack = false;
 	float TargetDistance = Owner->GetDistanceTo(Owner->Target);
 	if ( TargetDistance < AttackRadius * 2.0f)

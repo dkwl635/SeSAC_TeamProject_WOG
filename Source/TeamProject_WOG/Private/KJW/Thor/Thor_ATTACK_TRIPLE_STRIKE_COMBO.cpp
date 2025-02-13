@@ -6,14 +6,18 @@
 
 void UThor_ATTACK_TRIPLE_STRIKE_COMBO::EndPattern_CBP()
 {
+	//패턴종료시 히트 상태 전환가능
+	bHitable = true;
+
 	UE_LOG(LogTemp , Warning , TEXT("UThor_ATTACK_TRIPLE_STRIKE_COMBO_Attack_EndPattern_CBP"));
-	Owner->SetIdleTimer(4.0f);
 	Super::EndPattern_CBP();
 }
 
 void UThor_ATTACK_TRIPLE_STRIKE_COMBO::StartPattern_CBP()
 {
-	Super::StartPattern_CBP();
+	//패턴종료시 히트 상태 불가능
+	bHitable = false;
+
 	UE_LOG(LogTemp, Warning, TEXT("Attack_StartPattern_C"));
 	AttackCount = 0;
 	bAttack = false;
@@ -66,6 +70,9 @@ void UThor_ATTACK_TRIPLE_STRIKE_COMBO::NotifyEventPattern_C(int32 EventIndex)
 	}
 	
 	AttackCount++;
+
+	//이러면 첫 이벤트 이후로는 히트 상태 전환가능
+	bHitable = true;
 }
 
 void UThor_ATTACK_TRIPLE_STRIKE_COMBO::NotifyTickPattrern_C(int32 EventIndex, float FrameDeltaTime)

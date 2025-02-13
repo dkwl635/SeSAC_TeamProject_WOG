@@ -9,11 +9,22 @@ void UThor_ATTACK_HAMMER_THROW_START::InitPattern(AThor* Thor)
 {
 	Super::InitPattern(Thor);
 
-	
+	bHitable = false;
 }
 
 void UThor_ATTACK_HAMMER_THROW_START::StartPattern_C()
 {
+	Super::StartPattern_C();
+	//망치를 받는 패턴에 rate를 추가
+	UThorPattern* end = Owner->GetPattern(EThorPattern::ATTACK_HAMMER_THROW_END);
+	if ( end )
+	{
+		end->CurPatternRate = 50;
+	}
+
+	//패턴시작시 히트 상태 전환불가
+	bHitable = false;
+
 	//타겟과의 거리 계산
 	FVector Distance = Owner->GetActorLocation() - Owner->Target->GetActorLocation();
 	Distance.Z = 0;

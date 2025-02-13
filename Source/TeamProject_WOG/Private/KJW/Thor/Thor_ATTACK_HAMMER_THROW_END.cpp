@@ -15,14 +15,15 @@ void UThor_ATTACK_HAMMER_THROW_END::InitPattern(AThor* Thor)
 
 void UThor_ATTACK_HAMMER_THROW_END::StartPattern_C()
 {
-	//FVector NewHammerPos = Owner->GetActorLocation();
-	//NewHammerPos += Owner->GetActorForwardVector() * 1500.0f;
-	//Owner->ThorHammer->SetActorLocation(NewHammerPos);
-
+	Super::StartPattern_C();
+	
+	//몽타주 시작시 데미지 히트 불가
+	bHitable = false;
 }
 
 void UThor_ATTACK_HAMMER_THROW_END::StartPattern_CBP()
 {
+	Super::StartPattern_CBP();
 	//받을려는 
 	Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Play(AnimMontage);
 }
@@ -51,6 +52,9 @@ bool UThor_ATTACK_HAMMER_THROW_END::TickPattern_C()
 		Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_JumpToSection(FName("Start"), AnimMontage );
 		Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_Resume(AnimMontage);
 		Owner->ShowHammer(true);
+
+		//몽타주 시작시 데미지 히트 가능하게
+		bHitable = true;
 	}
 	else
 	{
