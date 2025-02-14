@@ -292,7 +292,13 @@ public:
 	// Main UI 위젯 인스턴스
 	UPROPERTY()
 	class UUserWidget* MainUI;
-	
+
+//2/14(금)
+	//방패 추가
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Shield")
+	class USkeletalMeshComponent* ShieldMesh;
+
+	void CameraAimRotation();
 
 
 	//-------------------------------------------------------------------
