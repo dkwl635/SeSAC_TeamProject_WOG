@@ -403,7 +403,7 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 				*/
 				
 				
-				OnAxeCollision(true);
+				//OnAxeCollision(true);
 				ClickOnce = true;
 
 				//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
