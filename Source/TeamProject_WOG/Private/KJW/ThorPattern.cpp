@@ -92,7 +92,7 @@ void UThorPattern::EndPattern_CBP()
 {
 	//End Pattern CBP
 	Owner->SetIdleTimer(IdleTime);
-	Owner->GetPattern(EThorPattern::IDLE)->SetOptionValue(IdleTime , bHitable == true ? 1 : -1);
+	Owner->GetPattern(EThorPattern::IDLE)->SetOptionValue(IdleTime , true);//bHitable == true ? 1 : -1);
 	Owner->StartPattarn(EThorPattern::IDLE);
 }
 
