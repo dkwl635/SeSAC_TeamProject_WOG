@@ -412,7 +412,7 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 		}
 		// 주먹 공격을 한다.
 		else {
-			FistCollision(true);
+			//FistCollision(true);
 			ClickOnce = true;
 
 			//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -420,7 +420,7 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 		}
 	}
 	else {
-		FistCollision(true);
+		//FistCollision(true);
 		ClickOnce = true;
 
 		// 일반 주먹 공격
