@@ -80,6 +80,22 @@ AKratosCharacter::AKratosCharacter()
 	Fist_L->SetRelativeScale3D(FVector(0.05f));
 	Fist_L->SetupAttachment(GetMesh(), FName(TEXT("Hand_L")));
 	Fist_L->SetCollisionProfileName(TEXT("PlayerAttack"));
+
+	//--------------------------------------------------------------
+	// 4. 방패 추가
+	ShieldMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ShieldMesh"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempShield(TEXT("/Script/Engine.SkeletalMesh'/Game/AxeAndShield/Meshes/SK_Shield.SK_Shield'"));
+
+	if ( TempShield.Succeeded() ) {
+		ShieldMesh->SetSkeletalMesh(TempShield.Object);
+		ShieldMesh->SetupAttachment(GetMesh(), FName(TEXT("Shield")));
+		ShieldMesh->SetRelativeScale3D(FVector(0.1f));
+
+		ShieldMesh->SetVisibility(true);
+
+	}
+	
+	///Script/Engine.SkeletalMesh'/Game/AxeAndShield/Meshes/SK_Shield.SK_Shield'
 }
 
 // Called when the game starts or when spawned
@@ -249,6 +265,32 @@ void AKratosCharacter::LookUp(const FInputActionValue& inputValue)
 	}
 }
 
+void AKratosCharacter::CameraAimRotation()
+{
+	float NewPitch = GetControlRotation().Pitch;
+
+	if ( NewPitch < 0.0f )
+	{
+		NewPitch = 0.0f;
+	}
+	else if ( NewPitch > 30.0f )
+	{
+		NewPitch = 30.0f;
+	}
+
+	// GetController()를 통해 PlayerController 얻기
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+
+	if ( PlayerController )
+	{
+		// 제한된 Pitch 값을 적용, Yaw는 그대로
+		FRotator NewRotation = FRotator(NewPitch , GetControlRotation().Yaw , 0.0f);
+		PlayerController->SetControlRotation(NewRotation);
+	}
+
+}
+
+
 // 플레이어 이동
 void AKratosCharacter::Move(const FInputActionValue& inputValue)
 {
@@ -271,6 +313,8 @@ void AKratosCharacter::Move(const FInputActionValue& inputValue)
 // Aim
 void AKratosCharacter::AimAxeAttack(const FInputActionValue& inputValue)
 {
+	CameraAimRotation();
+
 	if ( Kratos_EquippedWeapon && Kratos_HasWeapon) {
 		if ( AimAttackState == false ) {
 			IsAiming(true);
@@ -547,6 +591,7 @@ void AKratosCharacter::DashInput()
 			movement->MaxWalkSpeed = RunSpeed;
 		}
 }
+
 
 //--------------------------------------------------------------------------------------
 // 공통 데미지 주고 받기
