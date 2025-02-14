@@ -285,6 +285,15 @@ void AThor::TestKDamaged()
 	IsHit = true;
 }
 
+void AThor::ToggleAI()
+{
+	auto	a = Cast<UThor_Idle>(GetPattern(EThorPattern::IDLE));
+	if ( a )
+	{
+		a->IsAI = !( a->IsAI );
+	}
+}
+
 
 
 

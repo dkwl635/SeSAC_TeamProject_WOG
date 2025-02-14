@@ -139,7 +139,12 @@ public:
 	float MapSize = 3000.f;
 
 	public:
-		//임시 데미지 이벤트 호출
-		UFUNCTION(BlueprintCallable)
-		void TestKDamaged();
+	//임시 데미지 이벤트 호출
+	UFUNCTION(BlueprintCallable)
+	void TestKDamaged();
+
+	public:
+	//임시 토르 AI 전환
+	UFUNCTION(BlueprintCallable)
+	void ToggleAI();
 };
