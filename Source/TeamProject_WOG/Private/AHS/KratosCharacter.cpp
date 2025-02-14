@@ -116,6 +116,9 @@ void AKratosCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	OnAxeCollision(false);
+	FistCollision(false);
+
 	// 컨트롤러 비활성화
 	if ( CharacterState == EWOG_Character_State::STUN) {
 		return;
@@ -141,8 +144,8 @@ void AKratosCharacter::Tick(float DeltaTime)
 				mState = EKratosState::Idle;
 				currentTime = 0.0f;
 				ClickOnce = false;
-				FistCollision(false);
-				OnAxeCollision(false);
+				//FistCollision(false);
+				//OnAxeCollision(false);
 			}
 		
 		} break;
@@ -400,7 +403,7 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 				*/
 				
 				
-				OnAxeCollision(true);
+				//OnAxeCollision(true);
 				ClickOnce = true;
 
 				//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -507,7 +510,8 @@ void AKratosCharacter::RecallAxe()
 // 충돌 처리(Collision)
 void AKratosCharacter::OnHandOverlapBP(AActor* OtherActor , FVector SweepResult)
 {
-	FistCollision(false);
+	//FistCollision(true);
+	//OnAxeCollision(true);
 
 	AThor* thor = Cast<AThor>(OtherActor);
 	if ( thor != nullptr ) {
