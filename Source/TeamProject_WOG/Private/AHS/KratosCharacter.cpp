@@ -18,6 +18,9 @@
 #include "CombatInterface.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"
+#include "Components/CapsuleComponent.h"
 
 
 
@@ -90,12 +93,16 @@ AKratosCharacter::AKratosCharacter()
 		ShieldMesh->SetSkeletalMesh(TempShield.Object);
 		ShieldMesh->SetupAttachment(GetMesh(), FName(TEXT("Shield")));
 		ShieldMesh->SetRelativeScale3D(FVector(0.1f));
-
-		ShieldMesh->SetVisibility(true);
-
+		ShieldMesh->SetVisibility(false);
 	}
+
+	ShieldCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("ShieldCollision"));
+	ShieldCollision->SetupAttachment(ShieldMesh);
+	ShieldCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	///Script/Engine.SkeletalMesh'/Game/AxeAndShield/Meshes/SK_Shield.SK_Shield'
+
+	//--------------------------------------------------------------
+
 }
 
 // Called when the game starts or when spawned
@@ -119,13 +126,32 @@ void AKratosCharacter::BeginPlay()
 	MainUI->AddToViewport();
 
 	//3. Anim Notify 구현
-	//GetMesh()->GetAnimInstance()->OnPlayMontageNotifyBegin.AddDynamic(this, &AKratosCharacter::AxeComboNotify);
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if ( AnimInstance )
+	{
+		UE_LOG(LogTemp , Warning , TEXT("Animation Instance Found! Binding Notify"));
+		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this , &AKratosCharacter::OnAttackNotify);
+		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this , &AKratosCharacter::OnShieldNotifyBegin);
+
+	}
+	else
+	{
+		UE_LOG(LogTemp , Error , TEXT("No Animation Instance Found!"));
+	}
+
 
 	//4. 주먹 Collider 꺼두기
 	FistCollision(false);
 	OnAxeCollision(false);
 
+	//--------------------------------------------------------------
+	// 5. 방패 숨기기
+	bShieldVisible = false;
+
+
 }
+
+
 
 // Called every frame
 void AKratosCharacter::Tick(float DeltaTime)
@@ -172,7 +198,23 @@ void AKratosCharacter::Tick(float DeltaTime)
 	AddMovementInput(Direction);
 	Direction = FVector::ZeroVector;
 
+	// Camera Lock On Update
+	if ( bIsLockedOn )
+	{
+		APlayerController* PlayerController = Cast<APlayerController>(GetController());
+		AThor* Thor = Cast<AThor>(UGameplayStatics::GetActorOfClass(GetWorld() , AThor::StaticClass()));
+
+		if ( PlayerController && Thor )
+		{
+			FRotator LookAtRotation = ( Thor->GetActorLocation() - GetActorLocation() ).Rotation();
+			PlayerController->SetControlRotation(FRotator(0.0f , LookAtRotation.Yaw , 0.0f)); // Pitch는 0으로 고정
+		}
+	}
+
 }
+
+
+
 
 
 // 입력 연결
@@ -190,6 +232,9 @@ void AKratosCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		PlayerInput->BindAction(IA_LookUp , ETriggerEvent::Triggered , this , &AKratosCharacter::LookUp);
 		PlayerInput->BindAction(IA_Move , ETriggerEvent::Triggered , this , &AKratosCharacter::Move);
 
+		//camera lock on 구현
+		PlayerInput->BindAction(IA_LockOn , ETriggerEvent::Triggered , this , &AKratosCharacter::LockOnTarget);
+
 		//대쉬
 		PlayerInput->BindAction(IA_Dash , ETriggerEvent::Started , this , &AKratosCharacter::DashInput);
 		PlayerInput->BindAction(IA_Dash , ETriggerEvent::Completed , this , &AKratosCharacter::DashInput);
@@ -205,6 +250,10 @@ void AKratosCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		// 2-3. 플레이어 공격 및 무기 장착
 		PlayerInput->BindAction(IA_Attack, ETriggerEvent::Started, this, &AKratosCharacter::AttackAction);
 		PlayerInput->BindAction(IA_Sheath_UnSheath, ETriggerEvent::Started, this , &AKratosCharacter::SheathAction);
+
+		//3. 다른 행동
+		PlayerInput->BindAction(IA_Block , ETriggerEvent::Started , this , &AKratosCharacter::BlockAttack);
+		PlayerInput->BindAction(IA_Block , ETriggerEvent::Completed , this , &AKratosCharacter::BlockAttackEnd);
 	}
 
 }
@@ -235,62 +284,38 @@ void AKratosCharacter::Turn(const FInputActionValue& inputValue)
 void AKratosCharacter::LookUp(const FInputActionValue& inputValue)
 {
 	float value = inputValue.Get<float>();
-
 	float AdjustedValue = value * VerticalRotationSpeed;
 
 	// 현재 카메라의 Pitch 값을 얻어옴
 	float CurrentPitch = GetControlRotation().Pitch;
 
-	// 새로운 Pitch 값을 계산
-	float NewPitch = CurrentPitch + AdjustedValue;
+	// Pitch 값을 -180 ~ 180 범위로 정규화
+	CurrentPitch = FRotator::NormalizeAxis(CurrentPitch);
 
-	// 0도에서 30도까지 제한
-	if ( NewPitch < 0.0f )
-	{
-		NewPitch = 0.0f;
-	}
-	else if ( NewPitch > 30.0f )
-	{
-		NewPitch = 30.0f;
-	}
+	// 새로운 Pitch 값을 계산하고 -20 ~ 30도로 제한
+	SavedPitch = FMath::Clamp(CurrentPitch + AdjustedValue , -20.0f , 30.0f);
 
-	// GetController()를 통해 PlayerController 얻기
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
-
 	if ( PlayerController )
 	{
 		// 제한된 Pitch 값을 적용, Yaw는 그대로
-		FRotator NewRotation = FRotator(NewPitch , GetControlRotation().Yaw , 0.0f);
+		FRotator NewRotation = FRotator(SavedPitch , GetControlRotation().Yaw , 0.0f);
 		PlayerController->SetControlRotation(NewRotation);
 	}
 }
 
 void AKratosCharacter::CameraAimRotation()
 {
-	float NewPitch = GetControlRotation().Pitch;
-
-	if ( NewPitch < 0.0f )
-	{
-		NewPitch = 0.0f;
-	}
-	else if ( NewPitch > 30.0f )
-	{
-		NewPitch = 30.0f;
-	}
-
-	// GetController()를 통해 PlayerController 얻기
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
-
 	if ( PlayerController )
 	{
-		// 제한된 Pitch 값을 적용, Yaw는 그대로
-		FRotator NewRotation = FRotator(NewPitch , GetControlRotation().Yaw , 0.0f);
+		// 기존의 SavedPitch 값을 그대로 사용하여 바라보던 각도 유지
+		FRotator NewRotation = FRotator(SavedPitch , GetControlRotation().Yaw , 0.0f);
 		PlayerController->SetControlRotation(NewRotation);
 	}
-
 }
 
-
+//----------------------------------------------------------------------------
 // 플레이어 이동
 void AKratosCharacter::Move(const FInputActionValue& inputValue)
 {
@@ -399,6 +424,25 @@ bool AKratosCharacter::Get_KratosEquippedWeapon() const
 }
 
 //--------------------------------------------------------
+//Anim Montage 들고오기
+void AKratosCharacter::OnAttackNotify(FName NotifyName , const FBranchingPointNotifyPayload& BranchingPointPayload)
+{
+/*
+	if ( NotifyName == "PrintString" )
+	{
+		// 여기에 무기 충돌 활성화 로직 추가
+		FString logMsg = TEXT("Axe Collision Enabled!");
+		GEngine->AddOnScreenDebugMessage(0 , 1 , FColor::Red , logMsg);
+
+		UE_LOG(LogTemp , Warning , TEXT("Axe Collision Enabled!"));
+		AxeCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+	*/
+
+	UE_LOG(LogTemp , Warning , TEXT("OnAttackNotify Triggered: %s") , *NotifyName.ToString());
+}
+
+//---------------------------------------------------------
 // 공격
 void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 {
@@ -429,47 +473,20 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 				AimAttackState = true;
 
 				// 생성되어 날라가기
-				ThrowAxe();
+				//ThrowAxe();
 
 			}
 			// 근거리 공격(도끼)
 			else {
 
-				/*
-				UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-				
-				// 현재 콤보 몬타주를 재생하고 있지 않다면,
-				
-				if ( !( AnimInstance->Montage_IsPlaying(AxeCombo_Montage) ) ) {
-					AnimInstance->Montage_Play(AxeCombo_Montage);
-					
-				}
-				*/
-				
-				
-				//OnAxeCollision(true);
-				ClickOnce = true;
-
-				//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-				//AnimInstance->Montage_Play(Melee_Attack_Montage);
 			}
 		}
 		// 주먹 공격을 한다.
-		else {
-			//FistCollision(true);
-			ClickOnce = true;
-
-			//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-			//AnimInstance->Montage_Play(Fist_Attack_Montage);			
+		else {	
 		}
 	}
 	else {
-		//FistCollision(true);
-		ClickOnce = true;
 
-		// 일반 주먹 공격
-		//UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		//AnimInstance->Montage_Play(Fist_Attack_Montage);
 	}
 }
 
@@ -592,7 +609,6 @@ void AKratosCharacter::DashInput()
 		}
 }
 
-
 //--------------------------------------------------------------------------------------
 // 공통 데미지 주고 받기
 void AKratosCharacter::SetCharacterState(EWOG_Character_State NewState)
@@ -618,14 +634,99 @@ AActor* AKratosCharacter::GetActor()
 }
 
 //=======================================================================
-//WIP
-
-void AKratosCharacter::AxeComboNotify(FName AxeCombo , const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
+// Lock On Camera 구현
+void AKratosCharacter::LockOnTarget(const FInputActionValue& inputValue)
 {
-	FString logMsg = TEXT("Kratos Axe Notify!");
-	GEngine->AddOnScreenDebugMessage(0 , 1 , FColor::Red , logMsg);
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	AThor* Thor = Cast<AThor>(UGameplayStatics::GetActorOfClass(GetWorld() , AThor::StaticClass()));
+
+	if ( !PlayerController ) return;
+
+	// Lock On 해제
+	if ( bIsLockedOn )
+	{
+		bIsLockedOn = false;
+		return; // 락온을 해제하고 함수 종료
+	}
+
+	// Lock On 활성화
+	if ( Thor )
+	{
+		FRotator LookAtRotation = ( Thor->GetActorLocation() - GetActorLocation() ).Rotation();
+		PlayerController->SetControlRotation(FRotator(0.0f , LookAtRotation.Yaw , 0.0f)); // Pitch는 0으로 고정
+
+		bIsLockedOn = true;
+	}
+}
+
+// 방패 막기 구현
+void AKratosCharacter::BlockAttack(const FInputActionValue& inputValue)
+{
+	// 애니메이션 몬타주 실행	--> ABP에서 조건으로 처리중.
+	/*
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if ( AnimInstance && Block_Montage )
+	{
+		AnimInstance->Montage_Play(Block_Montage);
+	}
+	*/
+
+	if ( bShieldVisible == true) {
+
+	}
+	else {
+		bShieldVisible = true;
+		// 캡슐 콜라이더의 충돌 비활성화 (데미지 받지 않음)
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		ShieldCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+		// 일정 시간이 지나면 다시 충돌 활성화 (1.5초 후)
+		GetWorld()->GetTimerManager().SetTimer(UnblockTimerHandle , this , &AKratosCharacter::EnableCollision , 1.5f , false);
+	}
+}
+
+void AKratosCharacter::BlockAttackEnd(const FInputActionValue& inputValue)
+{
+	EnableCollision();
+	bShieldVisible = false;
+	ShieldCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AKratosCharacter::EnableCollision()
+{
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
 
+// Notify 이벤트 처리
+void AKratosCharacter::OnShieldNotifyBegin(FName NotifyName , const FBranchingPointNotifyPayload& Payload)
+{
+/*
+	if ( NotifyName == "ShowShield" )
+	{
+		ShieldMesh->SetVisibility(true);
+	}
+	else if ( NotifyName == "HideShield" )
+	{
+		ShieldMesh->SetVisibility(false);
+	}
+	*/
+}
 
+bool AKratosCharacter::Get_KratosShieldState() const
+{
+	return bShieldVisible;
+}
+
+// 방패 충돌 처리(Collision)
+void AKratosCharacter::OnShieldOverlapBP(AActor* OtherActor , FVector SweepResult)
+{
+	// 토르 공격이 들어오게 된다면, 
+	
+	// 방패 상태 종료
+	bShieldVisible = false;
+	ShieldCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	EnableCollision();
+
+}
 

@@ -131,6 +131,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool Get_KratosEquippedWeapon() const;
 
+	float SavedPitch = 0.0f;
+
 
 
 // 1. Camera
@@ -168,6 +170,9 @@ public:
 	UPROPERTY(EditDefaultsOnly , Category = "Input")
 	class UInputAction* IA_Attack;
 
+	UPROPERTY(EditDefaultsOnly , Category = "Input")
+	class UInputAction* IA_LockOn;
+
 
 	// 카메라 회전
 	void Turn(const FInputActionValue& inputValue);
@@ -187,6 +192,9 @@ public:
 
 	// 공격
 	void AttackAction(const FInputActionValue& inputValue);
+
+	// 카메라 록온
+	void LockOnTarget(const FInputActionValue& inputValue);
 
 //3. 애니메이션
 	UPROPERTY(EditAnywhere , Category = AnimMontage)
@@ -240,6 +248,7 @@ public:
 	FVector GetAimLocation();
 
 	//도끼 던지기
+	UFUNCTION(BlueprintCallable)
 	void ThrowAxe();
 
 	//도끼 불러오기
@@ -270,9 +279,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = AnimMontage)
 	UAnimMontage* AxeCombo_Montage;
 
-	UFUNCTION()
-	void AxeComboNotify(FName AxeCombo, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
-
 	//주먹 Collision 켜기/끄기
 	void FistCollision(bool bValue);
 
@@ -298,7 +304,50 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Shield")
 	class USkeletalMeshComponent* ShieldMesh;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Fist)
+	class UBoxComponent* ShieldCollision;
+
+	//---------------------------------------------------------
 	void CameraAimRotation();
+
+	// Anim Montage C++에서 실행
+	void OnAttackNotify(FName NotifyName , const FBranchingPointNotifyPayload& BranchingPointPayload);
+
+	bool bIsLockedOn = false;
+
+	// 방패 막기
+	UPROPERTY( EditDefaultsOnly , Category = "Input" )
+	class UInputAction* IA_Block;
+
+	void BlockAttack(const FInputActionValue& inputValue);
+	void BlockAttackEnd(const FInputActionValue& inputValue);
+
+	// 방패로 막기
+	UPROPERTY(EditAnywhere, Category = AnimMontage)
+	UAnimMontage* Block_Montage;
+
+	void EnableCollision();
+
+	FTimerHandle UnblockTimerHandle;
+
+
+	void OnShieldNotifyBegin(FName NotifyName , const FBranchingPointNotifyPayload& Payload);
+
+	// 방패 보이기 안 보이기
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Shield)
+	bool bShieldVisible = false;
+
+	// 무기 장착 상태 반환(BluePrint에서 장착된 무기의 Visibility 설정에 사용중)
+	UFUNCTION(BlueprintPure)
+	bool Get_KratosShieldState() const;
+
+	UFUNCTION(BlueprintCallable)
+	void OnShieldOverlapBP(AActor* OtherActor , FVector SweepResult);
+
+
+
+
+
 
 
 	//-------------------------------------------------------------------
