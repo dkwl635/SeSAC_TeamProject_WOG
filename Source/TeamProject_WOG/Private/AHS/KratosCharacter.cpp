@@ -22,6 +22,8 @@
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
 
+#include "MainUI.h"
+
 
 
 // Sets default values
@@ -122,8 +124,13 @@ void AKratosCharacter::BeginPlay()
 
 	//2. Aim UI + Main UI
 	AimAxeUI = CreateWidget(GetWorld(), AimAxeUIFactory);
-	MainUI = CreateWidget(GetWorld(), MainUIFactory);
+	MainUI = CreateWidget<UMainUI>(GetWorld(), MainUIFactory);
 	MainUI->AddToViewport();
+
+	if(MainUI == nullptr ) return;
+
+	MainUI->SetKratosHP(CurrentHealth, MaxHealth);
+	MainUI->SetKratosRP(CurrentRage, MaxRage);
 
 	//3. Anim Notify 구현
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -191,6 +198,7 @@ void AKratosCharacter::Tick(float DeltaTime)
 			}
 		
 		} break;
+		case EKratosState::Rage: { } break;
 		case EKratosState::Damage: { } break;
 		case EKratosState::Die: { } break;
 	}
@@ -254,14 +262,17 @@ void AKratosCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		//3. 다른 행동
 		PlayerInput->BindAction(IA_Block , ETriggerEvent::Started , this , &AKratosCharacter::BlockAttack);
 		PlayerInput->BindAction(IA_Block , ETriggerEvent::Completed , this , &AKratosCharacter::BlockAttackEnd);
+
+		// 4. 분노 모드
+		PlayerInput->BindAction(IA_RageMode , ETriggerEvent::Started , this , &AKratosCharacter::RageModeAction);
 	}
 
 }
 
 // 크레토스 HP
-void AKratosCharacter::GetKratosHP()
+float AKratosCharacter::GetKratosHP()
 {
-
+	return CurrentHealth;
 }
 
 void AKratosCharacter::SetKratosHP()
@@ -270,6 +281,7 @@ void AKratosCharacter::SetKratosHP()
 }
 
 //--------------------------------------------------------
+#pragma region 카메라 관련 설정(Camera)
 //카메라 X 회전
 void AKratosCharacter::Turn(const FInputActionValue& inputValue)
 {
@@ -315,12 +327,14 @@ void AKratosCharacter::CameraAimRotation()
 	}
 }
 
+#pragma endregion
+
 //----------------------------------------------------------------------------
 // 플레이어 이동
 void AKratosCharacter::Move(const FInputActionValue& inputValue)
 {
 	if ( mState == EKratosState::Attack ) {
-
+		return;
 	}
 	else {
 		mState = EKratosState::Move;
@@ -398,6 +412,11 @@ void AKratosCharacter::ReturnAxetoHand(const FInputActionValue& inputValue)
 // 무기 장착
 void AKratosCharacter::SheathAction(const FInputActionValue& inputValue)
 {
+	//분노 모드일 때는 장착할 수 없음
+	if ( bRageMode == true ) {
+		return;
+	}
+
 	if ( Kratos_HasWeapon == true ) {
 		if ( Kratos_EquippedWeapon == true ) {
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -571,21 +590,18 @@ void AKratosCharacter::RecallAxe()
 // 충돌 처리(Collision)
 void AKratosCharacter::OnHandOverlapBP(AActor* OtherActor , FVector SweepResult)
 {
-	//FistCollision(true);
-	//OnAxeCollision(true);
-
 	AThor* thor = Cast<AThor>(OtherActor);
 	if ( thor != nullptr ) {
-		FString logMsg = TEXT("Thor Take Damage!");
-		GEngine->AddOnScreenDebugMessage(0 , 1 , FColor::Red , logMsg);
-
-		UE_LOG(LogTemp , Warning , TEXT("Thor"));
 
 		FWOG_DamageEvent DamageData;
 		DamageData.DamageValue = 10;
 		DamageData.HitPoint = SweepResult;
 
 		thor->TakeKDamage(DamageData , this);
+
+		if ( bRageMode == false ) {
+			AddRage(10);
+		}
 	}
 }
 
@@ -662,15 +678,6 @@ void AKratosCharacter::LockOnTarget(const FInputActionValue& inputValue)
 // 방패 막기 구현
 void AKratosCharacter::BlockAttack(const FInputActionValue& inputValue)
 {
-	// 애니메이션 몬타주 실행	--> ABP에서 조건으로 처리중.
-	/*
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if ( AnimInstance && Block_Montage )
-	{
-		AnimInstance->Montage_Play(Block_Montage);
-	}
-	*/
-
 	if ( bShieldVisible == true) {
 
 	}
@@ -729,4 +736,58 @@ void AKratosCharacter::OnShieldOverlapBP(AActor* OtherActor , FVector SweepResul
 	EnableCollision();
 
 }
+
+//========================================================================================
+void AKratosCharacter::AddRage(float fValue)
+{
+	if ( CurrentRage > 100.0f ) {
+		CurrentRage = 100.0f;
+	}
+	else {
+		CurrentRage += fValue;
+	}
+	
+	MainUI->SetKratosRP(CurrentRage , MaxRage);
+}
+
+void AKratosCharacter::RageModeAction(const FInputActionValue& inputValue)
+{
+	if ( CurrentRage >= 100.0f ) {
+		mState = EKratosState::Rage;
+
+		bRageMode = true;
+
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_Play(RageMode_Start_Montage);
+
+		if ( Kratos_EquippedWeapon == true ) {
+			Kratos_EquippedWeapon = false;
+
+			//AxeMesh->SetupAttachment(GetMesh() , TEXT("Unarmmed"));
+		}
+
+		GetWorld()->GetTimerManager().SetTimer(RageTimerHandle , this ,
+	   &AKratosCharacter::RageMode , 0.5f , true);
+	}
+}
+
+
+void AKratosCharacter::RageMode()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Rage Mode is Activated!"));
+	AddRage(-10.0f);
+
+	if ( CurrentRage <= 0.0f )
+	{
+		mState = EKratosState::Idle;
+
+		GetWorld()->GetTimerManager().ClearTimer(RageTimerHandle);
+
+		bRageMode = false;
+	}
+}
+
+
+
+
 

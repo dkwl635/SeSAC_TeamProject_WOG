@@ -41,6 +41,7 @@ enum class EKratosState : uint8 {
 	AxeMeleeAttackCombo UMETA(DisplayName = "Axe Melee Attack Combo") ,
 
 // 분노 상태(Rage)
+	Rage UMETA(DisplayName = "Rage"),
 	RageIdle UMETA(DisplayName = "Rage Idle") ,
 	RageAttackCombo UMETA(DisplayName = "Rage Attack Combo") ,
 };
@@ -78,9 +79,9 @@ public:
 	float MaxHealth = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
-	float CurrentHealth = 0.0f;
+	float CurrentHealth = 100.0f;
 
-	void GetKratosHP();
+	float GetKratosHP();
 	void SetKratosHP();
 
 
@@ -88,7 +89,10 @@ public:
 	//-------------------------------------------------------------------
 	// 분노 게이지(Rage meter)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
-	float Rage = 100.0f;
+	float CurrentRage = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
+	float MaxRage = 100.0f;
 
 	// 카메라 회전 제한
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
@@ -297,7 +301,7 @@ public:
 
 	// Main UI 위젯 인스턴스
 	UPROPERTY()
-	class UUserWidget* MainUI;
+	class UMainUI* MainUI;
 
 //2/14(금)
 	//방패 추가
@@ -343,10 +347,25 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void OnShieldOverlapBP(AActor* OtherActor , FVector SweepResult);
+	//---------------------------------------------------------
+//0217(월)
+	// 분노 게이지 차오르기
+	void AddRage(float fValue);
 
+	UPROPERTY( EditDefaultsOnly , Category = "Input" )
+	class UInputAction* IA_RageMode;
 
+	UPROPERTY(EditAnywhere , Category = AnimMontage)
+	UAnimMontage* RageMode_Start_Montage;
 
+	// 분노 게이지 모드
+	void RageModeAction(const FInputActionValue& inputValue);
 
+	void RageMode();
+
+	FTimerHandle RageTimerHandle;
+
+	bool bRageMode = false;
 
 
 
