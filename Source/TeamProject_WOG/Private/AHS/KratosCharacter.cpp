@@ -23,6 +23,9 @@
 #include "Components/CapsuleComponent.h"
 
 #include "MainUI.h"
+#include "../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h"
+#include "Components/SceneComponent.h"
+
 
 
 
@@ -104,6 +107,8 @@ AKratosCharacter::AKratosCharacter()
 	
 
 	//--------------------------------------------------------------
+	// 5. 현재 사용하는 아이템
+	CurrentItem = nullptr;
 
 }
 
@@ -265,6 +270,9 @@ void AKratosCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		// 4. 분노 모드
 		PlayerInput->BindAction(IA_RageMode , ETriggerEvent::Started , this , &AKratosCharacter::RageModeAction);
+
+		// 5. 아이템 사용
+		PlayerInput->BindAction(IA_ItemUse , ETriggerEvent::Started , this , &AKratosCharacter::UseItemAction);
 	}
 
 }
@@ -275,9 +283,9 @@ float AKratosCharacter::GetKratosHP()
 	return CurrentHealth;
 }
 
-void AKratosCharacter::SetKratosHP()
+void AKratosCharacter::SetKratosHP(float hp)
 {
-
+	CurrentHealth += hp;
 }
 
 //--------------------------------------------------------
@@ -738,6 +746,7 @@ void AKratosCharacter::OnShieldOverlapBP(AActor* OtherActor , FVector SweepResul
 }
 
 //========================================================================================
+// 분노 모드 추가
 void AKratosCharacter::AddRage(float fValue)
 {
 	if ( CurrentRage > 100.0f ) {
@@ -784,6 +793,79 @@ void AKratosCharacter::RageMode()
 		GetWorld()->GetTimerManager().ClearTimer(RageTimerHandle);
 
 		bRageMode = false;
+	}
+}
+
+//========================================================================================
+// 회복
+
+
+// 아이템 사용
+void AKratosCharacter::UseItemAction(const FInputActionValue& inputValue)
+{
+	if ( CurrentItem )
+	{
+		// 회복 아이템을 썼을 때
+		if ( bIsAHealItem )
+		{
+			SetKratosHP(30.0f);
+			MainUI->SetKratosHP(CurrentHealth , MaxHealth);
+
+
+			UParticleSystemComponent* SpawnedVFX = UGameplayStatics::SpawnEmitterAtLocation(GetWorld() , HealItemUseVFX , CurrentItem->GetActorTransform());
+
+			// 1초 후 삭제 예약
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle , [SpawnedVFX]()
+			{
+							if ( SpawnedVFX )
+							{
+								SpawnedVFX->DestroyComponent();
+							}
+			} , 1.0f , false);
+
+			// 나이아가라 VFX 사용
+			/*
+			if ( HealItemUseNiagaraVFX )
+			{
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+					GetWorld() ,
+					HealItemUseNiagaraVFX , // 나이아가라 시스템 변수
+					CurrentItem->GetActorLocation() ,
+					CurrentItem->GetActorRotation()
+				);
+			}
+			*/
+
+			bIsAHealItem = false;
+		}
+		else
+		{
+			// 분노 아이템을 썼을 때
+			if ( bIsARageItem == true ) 
+			{
+				AddRage(30.0f);
+				MainUI->SetKratosRP(CurrentRage, MaxRage);
+
+				UParticleSystemComponent* SpawnedVFX = UGameplayStatics::SpawnEmitterAtLocation(GetWorld() , RageItemUseVFX , CurrentItem->GetActorTransform());
+
+				// 1초 후 삭제 예약
+				FTimerHandle TimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle , [SpawnedVFX]()
+				{
+						if ( SpawnedVFX )
+						{
+							SpawnedVFX->DestroyComponent();
+						}
+				} , 1.0f , false);
+
+
+				bIsARageItem = false;
+			}
+		}
+
+		CurrentItem->Destroy();  // 아이템 삭제
+		CurrentItem = nullptr;
 	}
 }
 

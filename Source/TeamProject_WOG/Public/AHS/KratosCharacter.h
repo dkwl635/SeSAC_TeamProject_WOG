@@ -10,6 +10,8 @@
 
 #include "TeamProject_WOG/TeamProject_WOG.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
+#include "../../../../Plugins/FX/Niagara/Source/Niagara/Classes/NiagaraSystem.h"
+
 
 #include "KratosCharacter.generated.h"
 
@@ -79,10 +81,10 @@ public:
 	float MaxHealth = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
-	float CurrentHealth = 100.0f;
+	float CurrentHealth = 70.0f;
 
 	float GetKratosHP();
-	void SetKratosHP();
+	void SetKratosHP(float hp);
 
 
 	
@@ -366,6 +368,30 @@ public:
 	FTimerHandle RageTimerHandle;
 
 	bool bRageMode = false;
+
+	//==================================================================
+//0218(화)
+	// 아이템 사용 Input Action
+	UPROPERTY(EditDefaultsOnly , Category = "Input")
+	class UInputAction* IA_ItemUse;
+
+	void UseItemAction(const FInputActionValue& inputValue);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Interaction")
+	AActor* CurrentItem;
+
+	//UPROPERTY(EditAnywhere)
+	//class UNiagaraSystem* HealItemUseNiagaraVFX;
+
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* HealItemUseVFX;
+
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* RageItemUseVFX;
+
+	bool bIsAHealItem = false;
+	bool bIsARageItem = false;
+
 
 
 
