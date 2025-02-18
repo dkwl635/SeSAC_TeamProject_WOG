@@ -302,7 +302,7 @@ public:
 	TSubclassOf<class UUserWidget> MainUIFactory;
 
 	// Main UI 위젯 인스턴스
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UMainUI* MainUI;
 
 //2/14(금)
