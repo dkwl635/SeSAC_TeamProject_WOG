@@ -40,4 +40,7 @@ public:
 	float DashSpeed = 1300.0f;
 	
 	bool bAttack = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UNiagaraSystem* Effect;
 };

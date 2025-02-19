@@ -61,4 +61,7 @@ public:
 private:
 	bool IsGround = false;
 
+public:
+	UPROPERTY(EditAnywhere , BlueprintReadWrite)
+	class UNiagaraComponent* WeaponEffect;
 };

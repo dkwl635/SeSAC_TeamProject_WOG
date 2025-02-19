@@ -51,6 +51,9 @@ protected:
 	virtual void NotifyTickPattrern_C(int32 EventIndex , float FrameDeltaTime) override;
 	virtual void NotifyEventPattern_C(int32 EventIndex) override;
 
+	virtual void NotifyBeginPattern_C(int32 EventIndex , float TotalDuration) override;
+	virtual void NotifyEndPattrern_C(int32 EventIndex) override;
+
 	virtual bool IsStartable() override;
 
 	UFUNCTION()

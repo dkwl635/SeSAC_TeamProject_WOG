@@ -3,6 +3,9 @@
 
 #include "KJW/Thor/Thor_ATTACK_THUNDER_CLAP.h"
 
+#include "NiagaraSystem.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 void UThor_ATTACK_THUNDER_CLAP::StartPattern_CBP()
 {	
@@ -28,26 +31,40 @@ void UThor_ATTACK_THUNDER_CLAP::NotifyEventPattern_C(int32 EventIndex)
 {
 	if ( !Owner ) { return; }
 
-	FHitResult OutHit;
-	// 레이의 시작 지점
-	FVector Start = FVector(0.f , 0.f , 0.f);
-	Start = Owner->GetActorLocation() + Owner->GetActorForwardVector() * AttackRadius;
-
-	// 충돌 쿼리 파라미터
-	FCollisionQueryParams CollisionParams;
-	bool bHit = Owner->GetWorld()->SweepSingleByChannel(OutHit , Start , Start , FQuat::Identity , EWOGTraceChannel::EnemyAttackTrace , FCollisionShape::MakeSphere(AttackRadius) , CollisionParams);
-
-	FColor SphereColor = bHit ? FColor::Red : FColor::Green;
-	DrawDebugSphere(Owner->GetWorld() , Start , AttackRadius , 12 , SphereColor , false , 1.0f , 0 , 2.0f);
-
-	if ( bHit )
+	if ( EventIndex == 0 )
 	{
-		FWOG_DamageEvent DamageData;
-		DamageData.DamageValue = 10;
-		DamageData.HitPoint = OutHit.ImpactPoint;
-		Owner->Target->TakeKDamage(DamageData , Owner);
-		UE_LOG(LogTemp , Warning , TEXT("충돌한 액터: %s") , *OutHit.GetActor()->GetName());
+		FHitResult OutHit;
+		// 레이의 시작 지점
+		FVector Start = FVector(0.f , 0.f , 0.f);
+		Start = Owner->GetActorLocation() + Owner->GetActorForwardVector() * AttackRadius;
+
+		// 충돌 쿼리 파라미터
+		FCollisionQueryParams CollisionParams;
+		bool bHit = Owner->GetWorld()->SweepSingleByChannel(OutHit , Start , Start , FQuat::Identity , EWOGTraceChannel::EnemyAttackTrace , FCollisionShape::MakeSphere(AttackRadius) , CollisionParams);
+
+		FColor SphereColor = bHit ? FColor::Red : FColor::Green;
+		DrawDebugSphere(Owner->GetWorld() , Start , AttackRadius , 12 , SphereColor , false , 1.0f , 0 , 2.0f);
+
+		if ( bHit )
+		{
+			FWOG_DamageEvent DamageData;
+			DamageData.DamageValue = 10;
+			DamageData.HitPoint = OutHit.ImpactPoint;
+			Owner->Target->TakeKDamage(DamageData , Owner);
+			UE_LOG(LogTemp , Warning , TEXT("충돌한 액터: %s") , *OutHit.GetActor()->GetName());
+		}
 	}
+	else
+	{
+		FVector SpawnPos = FVector(0.f , 0.f , 0.f);
+		SpawnPos = Owner->GetActorLocation() + Owner->GetActorForwardVector() * AttackRadius;
+		SpawnPos.Z += 50.0f;
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld() , Effect , SpawnPos , Owner->GetActorForwardVector().Rotation() , FVector(1.0f));
+		
+
+	}
+
+
 }
 
 void UThor_ATTACK_THUNDER_CLAP::NotifyTickPattrern_C(int32 EventIndex , float FrameDeltaTime)

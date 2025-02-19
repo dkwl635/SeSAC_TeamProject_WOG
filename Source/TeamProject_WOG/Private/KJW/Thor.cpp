@@ -8,6 +8,8 @@
 #include "KJW/Thor/Thor_Idle.h"
 #include "KJW/Thor/Thor_HIT.h"
 #include "KJW/ThorHammer.h"
+#include "NiagaraComponent.h"
+
 // Sets default values
 AThor::AThor()
 {
@@ -17,12 +19,16 @@ AThor::AThor()
 	BodyCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("BodyCollision"));
 	BodyComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BodyComp"));
 	HammerComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HammerComp"));
+	WeaponEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("WeaponEffect"));
+
 
 	SetRootComponent(BodyCollision);
 	BodyComp->SetupAttachment(GetRootComponent());
 	HammerComp->SetupAttachment(BodyComp, TEXT("hand_r"));
 	HammerComp->SetRelativeScale3D(FVector(0.04f));
 	HammerComp->SetRelativeLocation(FVector( -0.4f , 0.0f , -0.8f ));
+
+	WeaponEffect->SetupAttachment(HammerComp);
 }
 
 // Called when the game starts or when spawned
@@ -48,6 +54,8 @@ void AThor::BeginPlay()
 	//토르 맵 판단크기
 	DrawDebugSphere(GetWorld() , GetActorLocation() , MapSize , 12 , FColor::Blue , false , 15.0f , 0);
 
+
+	WeaponEffect->Deactivate();
 }
 
 // Called every frame
@@ -55,6 +63,7 @@ void AThor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if ( Hp <= 0 ) { return; }
 
 	if ( CurPattern )
 	{
@@ -96,6 +105,7 @@ void AThor::SetCharacterState(EWOG_Character_State NewState)
 
 void AThor::TakeKDamage( const FWOG_DamageEvent& DamageEvent, ICombatInterface* DamageCauser)
 {
+	if ( Hp <= 0 ) { return; }
 	
 	float DamageValue = DamageEvent.DamageValue;
 
@@ -105,6 +115,15 @@ void AThor::TakeKDamage( const FWOG_DamageEvent& DamageEvent, ICombatInterface* 
 	}
 
 	IsHit = true;
+
+	Hp -= DamageValue;
+	StunValue += 5;
+
+	if ( UpdateHp.IsBound() )UpdateHp.Execute();
+	if ( UpdateStun.IsBound() )UpdateStun.Execute();
+
+
+	
 }
 
 USkeletalMeshComponent* AThor::GetSkeletalMesh()
@@ -278,6 +297,20 @@ void AThor::ShowHammer(bool bShow)
 	IsHammer = bShow;
 	
 	HammerComp->SetVisibility(bShow);
+
+	
+}
+
+void AThor::ShowHammerEffect(bool bShow)
+{
+	if ( bShow )
+	{
+		WeaponEffect->Activate();
+	}
+	else
+	{
+		WeaponEffect->Deactivate();
+	}
 }
 
 void AThor::TestKDamaged()

@@ -6,6 +6,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "AHS/KratosCharacter.h"
 #include "KJW/Thor.h"
+#include "NiagaraComponent.h"
+
 // Sets default values
 AThorHammer::AThorHammer()
 {
@@ -13,9 +15,13 @@ AThorHammer::AThorHammer()
 	PrimaryActorTick.bCanEverTick = true;
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("ShapeComp"));
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
+	WeaponEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("WeaponEffect"));
+
 
 	SetRootComponent(SphereComp);
 	MeshComp->SetupAttachment(GetRootComponent());
+	WeaponEffect->SetupAttachment(MeshComp);
+
 }
 
 // Called when the game starts or when spawned
@@ -26,11 +32,12 @@ void AThorHammer::BeginPlay()
 	IsHammerFly = false;
 
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this , &ThisClass::OverlapHammer);
+
+	//WeaponEffect->Deactivate();
 }
 
 void AThorHammer::HammerFly(FVector Direction)
 {
-	
 	//날아가는 방향으로 머리 회전 시키기
 	FlyDirection = Direction;
 	FRotator rot = FlyDirection.Rotation();
@@ -40,12 +47,12 @@ void AThorHammer::HammerFly(FVector Direction)
 void AThorHammer::StartHammerFly(FVector Direction)
 {
 	
-
 	IsGround = false;
 	//날아가는 2초동안 날아가게
 	HammerFly(Direction);
 	IsHammerFly = true;
 	MoveTimer = 0.0f;
+	//WeaponEffect->Activate();
 	GetWorldTimerManager().SetTimer(FlyMoveTimerHandle , this , &ThisClass::HammerMoveTick , 0.02f , true , 0.0f);
 }
 
@@ -54,9 +61,6 @@ void AThorHammer::HammerMoveTick()
 	//2초동안 날아가는 tick
 	MoveTimer += 0.02f;
 	FVector NewPos = GetActorLocation();
-
-
-
 	//NewPos += MoveSpeed * FlyDirection * 0.02f;
 	NewPos += MoveSpeed * GetActorForwardVector() * 0.02f;
 	
@@ -73,6 +77,8 @@ void AThorHammer::ReturnHammerFly()
 {
 	//돌아오고 손에 있는 상태
 	IsHammerFly = false;
+
+	//WeaponEffect->Deactivate();
 
 	if ( FlyDownTimerHandle.IsValid() )
 	{

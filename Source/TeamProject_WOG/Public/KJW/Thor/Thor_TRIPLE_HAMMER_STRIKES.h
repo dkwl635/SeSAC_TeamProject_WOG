@@ -47,7 +47,7 @@ protected:
 	virtual void NotifyBeginPattern_C(int32 EventIndex , float TotalDuration) override;
 	virtual void NotifyEndPattrern_C(int32 EventIndex) override;
 	virtual void NotifyTickPattrern_C(int32 EventIndex , float FrameDeltaTime) override;
-
+	virtual void EndPattern_CBP() override;
 	virtual bool IsStartable() override;
 
 };

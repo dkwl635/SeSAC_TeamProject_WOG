@@ -41,6 +41,9 @@ public:
 	UPROPERTY(EditAnywhere , BlueprintReadWrite)
 	class UStaticMeshComponent* HammerComp;
 
+	UPROPERTY(EditAnywhere , BlueprintReadWrite)
+	class UNiagaraComponent* WeaponEffect;
+
 //애니메이션 관련
 private:
 	UPROPERTY()
@@ -134,17 +137,37 @@ public:
 	TSubclassOf<class AThorHammer> ThorHammerClass;
 	class AThorHammer* ThorHammer;
 
+	//토르 망치 이펙트 On/Off
+	void ShowHammerEffect(bool bShow);
+
 	//맵 사이즈
 	UPROPERTY(EditDefaultsOnly)
 	float MapSize = 3000.f;
 
-	public:
+public:
 	//임시 데미지 이벤트 호출
 	UFUNCTION(BlueprintCallable)
 	void TestKDamaged();
 
-	public:
+public:
 	//임시 토르 AI 전환
 	UFUNCTION(BlueprintCallable)
 	void ToggleAI();
+
+	public:
+		UPROPERTY(EditDefaultsOnly)
+		float Hp = 100;
+
+		UPROPERTY(EditDefaultsOnly)
+		float MaxHp = 100;
+
+		UPROPERTY(EditDefaultsOnly)
+		float StunValue = 0;
+
+		UPROPERTY(EditDefaultsOnly)
+		float StunMaxValue = 100;
+
+
+		FSimpleDelegate UpdateHp;
+		FSimpleDelegate UpdateStun;
 };

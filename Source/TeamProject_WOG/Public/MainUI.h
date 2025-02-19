@@ -29,5 +29,22 @@ public:
 
 	void SetKratosRP(float Cur, float Max);
 
+
+
+//토르 관련
+//토르 HP 바 정보 연결하기
+public:
+	UPROPERTY()
+	class AThor* Thor;
+
+	UPROPERTY(EditAnywhere , meta = ( BindWidget ))
+	class UProgressBar* ThorHealthBar;
 	
+	UPROPERTY(EditAnywhere , meta = ( BindWidget ))
+	class UProgressBar* StunBar;
+
+	void SetThorHp();
+	void SetThorStun();
+
+
 };

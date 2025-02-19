@@ -11,6 +11,8 @@ void UThor_TRIPLE_HAMMER_STRIKES::StartPattern_CBP()
 	UE_LOG(LogTemp , Warning , TEXT("Attack_StartPattern_C"));
 	bAttack = false;
 	float TargetDistance = Owner->GetDistanceTo(Owner->Target);
+	
+	Owner->ShowHammerEffect(true);
 	if ( TargetDistance < AttackDistance )
 	{
 		bAttack = true;
@@ -102,11 +104,13 @@ void UThor_TRIPLE_HAMMER_STRIKES::NotifyTickPattrern_C(int32 EventIndex , float 
 	}
 
 
+}
 
+void UThor_TRIPLE_HAMMER_STRIKES::EndPattern_CBP()
+{
+	Owner->ShowHammerEffect(false);
 
-	
-
-
+	Super::EndPattern_CBP();
 }
 
 bool UThor_TRIPLE_HAMMER_STRIKES::IsStartable()

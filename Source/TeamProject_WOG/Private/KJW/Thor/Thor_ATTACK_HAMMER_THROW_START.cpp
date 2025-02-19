@@ -33,6 +33,8 @@ void UThor_ATTACK_HAMMER_THROW_START::StartPattern_C()
 	Distance.Normalize();
 	UE_LOG(LogTemp, Warning, TEXT("DisSize : %f") , DisSize);
 
+	Owner->ShowHammerEffect(true);
+
 	bEndPattern = false;
 	//멀리 있을때
 	if (DisSize >= AttackRange*0.9f)
@@ -175,6 +177,7 @@ void UThor_ATTACK_HAMMER_THROW_START::NotifyEventPattern_C(int32 EventIndex)
 
 		FVector flyDir = (Owner->Target->GetActorLocation() + FVector(0.0f , 0.0f , 30.0f)) - MoveLocation;
 		flyDir.Normalize();
+		Owner->ShowHammerEffect(false);
 		Owner->ThorHammer->StartHammerFly(flyDir);
 
 	}
@@ -211,6 +214,22 @@ void UThor_ATTACK_HAMMER_THROW_START::NotifyEventPattern_C(int32 EventIndex)
 		StartPattern();
 	}
 	
+}
+
+void UThor_ATTACK_HAMMER_THROW_START::NotifyBeginPattern_C(int32 EventIndex , float TotalDuration)
+{
+	if ( ParrtenIndex == 0 )
+	{
+		Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_SetPlayRate(AnimMontage , 0.3f);
+	}
+}
+
+void UThor_ATTACK_HAMMER_THROW_START::NotifyEndPattrern_C(int32 EventIndex)
+{
+	if ( ParrtenIndex == 0 )
+	{
+		Owner->GetSkeletalMesh()->GetAnimInstance()->Montage_SetPlayRate(AnimMontage , 1.0f);
+	}
 }
 
 bool UThor_ATTACK_HAMMER_THROW_START::IsStartable()
