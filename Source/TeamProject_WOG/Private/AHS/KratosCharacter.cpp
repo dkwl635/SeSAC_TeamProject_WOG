@@ -28,6 +28,8 @@
 #include "AHS/ItemSpawnManager.h"
 #include "AHS/Item.h"
 
+#include "AHS/Temp_GameMode.h"
+
 
 
 
@@ -105,6 +107,8 @@ AKratosCharacter::AKratosCharacter()
 
 	ShieldCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("ShieldCollision"));
 	ShieldCollision->SetupAttachment(ShieldMesh);
+
+	ShieldCollision->SetCollisionProfileName(TEXT("PlayerShield"));
 	ShieldCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 
@@ -172,6 +176,7 @@ void AKratosCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//-------------------------------------------------------------
 	OnAxeCollision(false);
 	FistCollision(false);
 
@@ -180,6 +185,8 @@ void AKratosCharacter::Tick(float DeltaTime)
 		return;
 	}
 
+
+	//=============================================================
 	FString logMsg = UEnum::GetValueAsString(mState);
 	GEngine->AddOnScreenDebugMessage(0 , 1 , FColor::Red , logMsg);
 
@@ -740,6 +747,9 @@ void AKratosCharacter::OnShieldOverlapBP(AActor* OtherActor , FVector SweepResul
 {
 	// 토르 공격이 들어오게 된다면, 
 	
+	// 애니메이션 몬타주 실행
+
+
 	// 방패 상태 종료
 	bShieldVisible = false;
 	ShieldCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -803,8 +813,6 @@ void AKratosCharacter::RageMode()
 
 
 // 아이템 사용
-
-
 void AKratosCharacter::UseItemAction(const FInputActionValue& inputValue)
 {
 	if ( CurrentItem )
@@ -887,6 +895,22 @@ void AKratosCharacter::UseItemAction(const FInputActionValue& inputValue)
 		CurrentItem = nullptr;
 	}
 }
+
+//=======================================================================================
+// 플레이어 피격 판정
+void AKratosCharacter::OnKratosDamageBP()
+{
+	// 애니메이션 몬타주 실행
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(TakeDamage_Montage);
+
+
+	// 데미지 적용, HP 업데이트
+	SetKratosHP(-10.0f);
+	MainUI->SetKratosHP(CurrentHealth , MaxHealth);
+	
+}
+
 
 
 
