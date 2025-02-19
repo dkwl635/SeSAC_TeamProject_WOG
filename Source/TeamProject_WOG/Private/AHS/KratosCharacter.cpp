@@ -25,6 +25,8 @@
 #include "MainUI.h"
 #include "../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h"
 #include "Components/SceneComponent.h"
+#include "AHS/ItemSpawnManager.h"
+#include "AHS/Item.h"
 
 
 
@@ -801,10 +803,27 @@ void AKratosCharacter::RageMode()
 
 
 // 아이템 사용
+
+
 void AKratosCharacter::UseItemAction(const FInputActionValue& inputValue)
 {
 	if ( CurrentItem )
 	{
+		AItemSpawnManager* itemSpawnManager = Cast<AItemSpawnManager>(UGameplayStatics::GetActorOfClass(GetWorld() , AItemSpawnManager::StaticClass()));
+
+		if ( itemSpawnManager )
+		{
+			itemSpawnManager->AllItemsinlevel -= 1;
+
+			// CurrentItem을 AItem 타입으로 캐스팅
+			AItem* UsedItem = Cast<AItem>(CurrentItem);
+			if ( UsedItem ) // 캐스팅이 성공했을 경우에만 실행
+			{
+				itemSpawnManager->FreeSpawnPoint(UsedItem->GetSpawnIndex());
+			}
+		}
+
+
 		// 회복 아이템을 썼을 때
 		if ( bIsAHealItem )
 		{

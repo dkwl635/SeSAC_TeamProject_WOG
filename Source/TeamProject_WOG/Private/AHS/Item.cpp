@@ -25,3 +25,13 @@ void AItem::Tick(float DeltaTime)
 
 }
 
+void AItem::SetSpawnIndex(int index)
+{
+	SpawnIndex = index;
+}
+
+int AItem::GetSpawnIndex() const
+{
+	return SpawnIndex;
+}
+
