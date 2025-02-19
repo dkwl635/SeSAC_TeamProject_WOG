@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "AHS/HealStone.h"
 #include "AHS/RageStone.h"
+#include "AHS/KratosCharacter.h"
 
 // Sets default values
 AItemSpawnManager::AItemSpawnManager()
@@ -56,6 +57,33 @@ void AItemSpawnManager::CreateItem()
 
 	// 아이템 배치하기
 	int32 RandItem = FMath::RandRange(1 , 100);
+
+	// 플레이어의 상태에 따라, 우선순위를 가져가는 상태가 존재함.
+	int32 PlayerCurrentState = 0;
+	AKratosCharacter* kratos = Cast<AKratosCharacter>(GetWorld()->GetFirstPlayerController());
+
+	if ( kratos != nullptr ) {
+		float hp = kratos->CurrentHealth;
+		float rp = kratos->CurrentRage;
+		
+		// HP가 우선순위를 가져감.
+		if (hp <= 50){
+			PlayerCurrentState = 70;
+		}
+		else {
+			// 분노 게이지 체크
+			if ( rp <= 50 ) {
+				PlayerCurrentState = 30;
+			}
+			else {
+				//HP도 높고, RP도 높다면 50%
+				PlayerCurrentState = 50;
+			}
+		}
+
+	}
+	
+
 	// AItemSpawnManager.cpp (아이템 생성 시 설정)
 	if ( RandItem < 50 ) {
 		AHealStone* newItem = GetWorld()->SpawnActor<AHealStone>(healStoneFactory , spawnPoints[index]->GetActorLocation() , FRotator(0));

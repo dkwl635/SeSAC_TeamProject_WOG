@@ -81,7 +81,7 @@ public:
 	float MaxHealth = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
-	float CurrentHealth = 10.0f;
+	float CurrentHealth = 100.0f;
 
 	float GetKratosHP();
 	void SetKratosHP(float hp);
@@ -397,6 +397,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void OnKratosDamageBP();
+
+	// 카메라 Shake 처리
+	// 카메라 Shake 처리
+	UPROPERTY(EditDefaultsOnly, Category = CameraMotion)
+	TSubclassOf<class UCameraShakeBase> CameraShake;
+
 
 
 	//-------------------------------------------------------------------

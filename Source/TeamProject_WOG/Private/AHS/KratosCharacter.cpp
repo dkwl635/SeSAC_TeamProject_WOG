@@ -213,7 +213,16 @@ void AKratosCharacter::Tick(float DeltaTime)
 		
 		} break;
 		case EKratosState::Rage: { } break;
-		case EKratosState::Damage: { } break;
+		case EKratosState::Damage: { 
+			Direction = FVector::ZeroVector;
+
+			currentTime += GetWorld()->DeltaTimeSeconds;
+			if ( currentTime >= 1.5f ) {
+				mState = EKratosState::Idle;
+				currentTime = 0.0f;
+			}
+		
+		} break;
 		case EKratosState::Die: { } break;
 	}
 
@@ -350,7 +359,7 @@ void AKratosCharacter::CameraAimRotation()
 // 플레이어 이동
 void AKratosCharacter::Move(const FInputActionValue& inputValue)
 {
-	if ( mState == EKratosState::Attack ) {
+	if ( mState == EKratosState::Attack || mState == EKratosState::Damage) {
 		return;
 	}
 	else {
@@ -514,7 +523,9 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 			}
 			// 근거리 공격(도끼)
 			else {
-
+				//카메라 셰이크 재생
+				//auto controller = GetWorld()->GetFirstPlayerController();
+				//controller->PlayerCameraManager->StartCameraShake(CameraShake);
 			}
 		}
 		// 주먹 공격을 한다.
@@ -611,14 +622,23 @@ void AKratosCharacter::OnHandOverlapBP(AActor* OtherActor , FVector SweepResult)
 	if ( thor != nullptr ) {
 
 		FWOG_DamageEvent DamageData;
-		DamageData.DamageValue = 10;
+
+		// 분노 모드 판별
+		if ( bRageMode == false ) {
+			AddRage(10);
+			DamageData.DamageValue = 10;
+		}
+		else {
+			DamageData.DamageValue = 30;
+		}
+		
 		DamageData.HitPoint = SweepResult;
 
 		thor->TakeKDamage(DamageData , this);
 
-		if ( bRageMode == false ) {
-			AddRage(10);
-		}
+		//카메라 셰이크 재생
+		auto controller = GetWorld()->GetFirstPlayerController();
+		controller->PlayerCameraManager->StartCameraShake(CameraShake);
 	}
 }
 
@@ -773,9 +793,15 @@ void AKratosCharacter::AddRage(float fValue)
 
 void AKratosCharacter::RageModeAction(const FInputActionValue& inputValue)
 {
+	//------------------------------------------------------------
 	if ( CurrentRage >= 100.0f ) {
 		mState = EKratosState::Rage;
 
+		//카메라 셰이크 재생
+		auto controller = GetWorld()->GetFirstPlayerController();
+		controller->PlayerCameraManager->StartCameraShake(CameraShake);
+
+		//--------------------------------------------------------
 		bRageMode = true;
 
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -900,6 +926,12 @@ void AKratosCharacter::UseItemAction(const FInputActionValue& inputValue)
 // 플레이어 피격 판정
 void AKratosCharacter::OnKratosDamageBP()
 {
+	mState = EKratosState::Damage;
+
+	//카메라 셰이크 재생
+	auto controller = GetWorld()->GetFirstPlayerController();
+	controller->PlayerCameraManager->StartCameraShake(CameraShake);
+
 	// 애니메이션 몬타주 실행
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(TakeDamage_Montage);
