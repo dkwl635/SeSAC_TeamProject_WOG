@@ -41,6 +41,9 @@ void UMainUI::SetThorHp()
 {
 	if ( !Thor ) return;
 
+
+	float orgin = ThorHealthBar->GetPercent();
+
 	if ( Thor->Hp <= 0 )
 	{
 		ThorHealthBar->SetPercent(0);
@@ -49,6 +52,17 @@ void UMainUI::SetThorHp()
 	{
 		ThorHealthBar->SetPercent(Thor->Hp/ Thor->MaxHp);
 	}
+
+	ThorHealthBackBar->SetFillColorAndOpacity(FLinearColor::Red);
+	ThorHealthBackBar->SetPercent(orgin);
+	
+	if ( HideHpBack.IsValid() )
+	{
+		GetWorld()->GetTimerManager().ClearTimer(HideHpBack);
+	}
+
+	GetWorld()->GetTimerManager().SetTimer(HideHpBack , this , &ThisClass::HideBackHp , 0.02f , true);
+
 }
 
 void UMainUI::SetThorStun()
@@ -63,4 +77,21 @@ void UMainUI::SetThorStun()
 	{
 		StunBar->SetPercent(Thor->StunValue / Thor->StunMaxValue);
 	}
+}
+
+void UMainUI::HideBackHp()
+{
+	FLinearColor CurrentColor = ThorHealthBackBar->GetFillColorAndOpacity();
+	float NewAlpha = FMath::Clamp(CurrentColor.A - ( 0.02f ) , 0.0f , 1.0f);
+	ThorHealthBackBar->SetFillColorAndOpacity(FLinearColor(CurrentColor.R , CurrentColor.G , CurrentColor.B , NewAlpha));
+
+
+	if ( CurrentColor.A <= 0 )
+	{
+		if ( HideHpBack.IsValid() )
+		{
+			GetWorld()->GetTimerManager().ClearTimer(HideHpBack);
+		}
+	}
+	
 }

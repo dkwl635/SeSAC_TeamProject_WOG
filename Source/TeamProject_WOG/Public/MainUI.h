@@ -39,12 +39,17 @@ public:
 
 	UPROPERTY(EditAnywhere , meta = ( BindWidget ))
 	class UProgressBar* ThorHealthBar;
+
+	UPROPERTY(EditAnywhere , meta = ( BindWidget ))
+	class UProgressBar* ThorHealthBackBar;
 	
 	UPROPERTY(EditAnywhere , meta = ( BindWidget ))
 	class UProgressBar* StunBar;
-
+	
 	void SetThorHp();
 	void SetThorStun();
 
 
+	FTimerHandle HideHpBack;
+	void HideBackHp();
 };

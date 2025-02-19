@@ -57,7 +57,7 @@ void UThor_ATTACK_THUNDER_CLAP::NotifyEventPattern_C(int32 EventIndex)
 	else
 	{
 		FVector SpawnPos = FVector(0.f , 0.f , 0.f);
-		SpawnPos = Owner->GetActorLocation() + Owner->GetActorForwardVector() * AttackRadius;
+		SpawnPos = Owner->GetActorLocation() + Owner->GetActorForwardVector() * AttackRadius * 0.5f;
 		SpawnPos.Z += 50.0f;
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld() , Effect , SpawnPos , Owner->GetActorForwardVector().Rotation() , FVector(1.0f));
 		
