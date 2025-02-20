@@ -25,6 +25,10 @@
 #include "MainUI.h"
 #include "../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h"
 #include "Components/SceneComponent.h"
+#include "AHS/ItemSpawnManager.h"
+#include "AHS/Item.h"
+
+#include "AHS/Temp_GameMode.h"
 
 
 
@@ -103,6 +107,8 @@ AKratosCharacter::AKratosCharacter()
 
 	ShieldCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("ShieldCollision"));
 	ShieldCollision->SetupAttachment(ShieldMesh);
+
+	ShieldCollision->SetCollisionProfileName(TEXT("PlayerShield"));
 	ShieldCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
 
@@ -170,6 +176,7 @@ void AKratosCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//-------------------------------------------------------------
 	OnAxeCollision(false);
 	FistCollision(false);
 
@@ -178,6 +185,8 @@ void AKratosCharacter::Tick(float DeltaTime)
 		return;
 	}
 
+
+	//=============================================================
 	FString logMsg = UEnum::GetValueAsString(mState);
 	GEngine->AddOnScreenDebugMessage(0 , 1 , FColor::Red , logMsg);
 
@@ -204,7 +213,16 @@ void AKratosCharacter::Tick(float DeltaTime)
 		
 		} break;
 		case EKratosState::Rage: { } break;
-		case EKratosState::Damage: { } break;
+		case EKratosState::Damage: { 
+			Direction = FVector::ZeroVector;
+
+			currentTime += GetWorld()->DeltaTimeSeconds;
+			if ( currentTime >= 1.5f ) {
+				mState = EKratosState::Idle;
+				currentTime = 0.0f;
+			}
+		
+		} break;
 		case EKratosState::Die: { } break;
 	}
 
@@ -341,7 +359,7 @@ void AKratosCharacter::CameraAimRotation()
 // 플레이어 이동
 void AKratosCharacter::Move(const FInputActionValue& inputValue)
 {
-	if ( mState == EKratosState::Attack ) {
+	if ( mState == EKratosState::Attack || mState == EKratosState::Damage) {
 		return;
 	}
 	else {
@@ -505,7 +523,9 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 			}
 			// 근거리 공격(도끼)
 			else {
-
+				//카메라 셰이크 재생
+				//auto controller = GetWorld()->GetFirstPlayerController();
+				//controller->PlayerCameraManager->StartCameraShake(CameraShake);
 			}
 		}
 		// 주먹 공격을 한다.
@@ -602,14 +622,23 @@ void AKratosCharacter::OnHandOverlapBP(AActor* OtherActor , FVector SweepResult)
 	if ( thor != nullptr ) {
 
 		FWOG_DamageEvent DamageData;
-		DamageData.DamageValue = 10;
+
+		// 분노 모드 판별
+		if ( bRageMode == false ) {
+			AddRage(10);
+			DamageData.DamageValue = 10;
+		}
+		else {
+			DamageData.DamageValue = 30;
+		}
+		
 		DamageData.HitPoint = SweepResult;
 
 		thor->TakeKDamage(DamageData , this);
 
-		if ( bRageMode == false ) {
-			AddRage(10);
-		}
+		//카메라 셰이크 재생
+		auto controller = GetWorld()->GetFirstPlayerController();
+		controller->PlayerCameraManager->StartCameraShake(CameraShake);
 	}
 }
 
@@ -738,6 +767,9 @@ void AKratosCharacter::OnShieldOverlapBP(AActor* OtherActor , FVector SweepResul
 {
 	// 토르 공격이 들어오게 된다면, 
 	
+	// 애니메이션 몬타주 실행
+
+
 	// 방패 상태 종료
 	bShieldVisible = false;
 	ShieldCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -761,9 +793,15 @@ void AKratosCharacter::AddRage(float fValue)
 
 void AKratosCharacter::RageModeAction(const FInputActionValue& inputValue)
 {
+	//------------------------------------------------------------
 	if ( CurrentRage >= 100.0f ) {
 		mState = EKratosState::Rage;
 
+		//카메라 셰이크 재생
+		auto controller = GetWorld()->GetFirstPlayerController();
+		controller->PlayerCameraManager->StartCameraShake(CameraShake);
+
+		//--------------------------------------------------------
 		bRageMode = true;
 
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -805,6 +843,21 @@ void AKratosCharacter::UseItemAction(const FInputActionValue& inputValue)
 {
 	if ( CurrentItem )
 	{
+		AItemSpawnManager* itemSpawnManager = Cast<AItemSpawnManager>(UGameplayStatics::GetActorOfClass(GetWorld() , AItemSpawnManager::StaticClass()));
+
+		if ( itemSpawnManager )
+		{
+			itemSpawnManager->AllItemsinlevel -= 1;
+
+			// CurrentItem을 AItem 타입으로 캐스팅
+			AItem* UsedItem = Cast<AItem>(CurrentItem);
+			if ( UsedItem ) // 캐스팅이 성공했을 경우에만 실행
+			{
+				itemSpawnManager->FreeSpawnPoint(UsedItem->GetSpawnIndex());
+			}
+		}
+
+
 		// 회복 아이템을 썼을 때
 		if ( bIsAHealItem )
 		{
@@ -868,6 +921,28 @@ void AKratosCharacter::UseItemAction(const FInputActionValue& inputValue)
 		CurrentItem = nullptr;
 	}
 }
+
+//=======================================================================================
+// 플레이어 피격 판정
+void AKratosCharacter::OnKratosDamageBP()
+{
+	mState = EKratosState::Damage;
+
+	//카메라 셰이크 재생
+	auto controller = GetWorld()->GetFirstPlayerController();
+	controller->PlayerCameraManager->StartCameraShake(CameraShake);
+
+	// 애니메이션 몬타주 실행
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(TakeDamage_Montage);
+
+
+	// 데미지 적용, HP 업데이트
+	SetKratosHP(-10.0f);
+	MainUI->SetKratosHP(CurrentHealth , MaxHealth);
+	
+}
+
 
 
 

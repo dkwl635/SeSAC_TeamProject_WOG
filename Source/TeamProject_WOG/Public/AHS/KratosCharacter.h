@@ -81,7 +81,7 @@ public:
 	float MaxHealth = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerSettings)
-	float CurrentHealth = 70.0f;
+	float CurrentHealth = 100.0f;
 
 	float GetKratosHP();
 	void SetKratosHP(float hp);
@@ -392,6 +392,16 @@ public:
 	bool bIsAHealItem = false;
 	bool bIsARageItem = false;
 
+	//====================================================
+	//데미지 받았을 때 처리
+
+	UFUNCTION(BlueprintCallable)
+	void OnKratosDamageBP();
+
+	// 카메라 Shake 처리
+	// 카메라 Shake 처리
+	UPROPERTY(EditDefaultsOnly, Category = CameraMotion)
+	TSubclassOf<class UCameraShakeBase> CameraShake;
 
 
 
