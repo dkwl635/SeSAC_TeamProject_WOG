@@ -412,6 +412,14 @@ public:
 	UPROPERTY()
 	class UUserWidget* RageModeUI;
 
+	// 분노 모드 시작시 생성되는 불 이펙트
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* RagemodeVFX;
+
+	// 적 Body와 오버랩 충돌이 되었을 때, 피 이펙트
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* BloodVFX;
+
 
 
 	//-------------------------------------------------------------------
