@@ -133,8 +133,10 @@ void AKratosCharacter::BeginPlay()
 		}
 	}
 
-	//2. Aim UI + Main UI
+	//2. Aim UI + Main UI, RageMode 생성
 	AimAxeUI = CreateWidget(GetWorld(), AimAxeUIFactory);
+	RageModeUI = CreateWidget(GetWorld() , RageModeUIFactory);
+
 	MainUI = CreateWidget<UMainUI>(GetWorld(), MainUIFactory);
 	MainUI->AddToViewport();
 
@@ -795,6 +797,8 @@ void AKratosCharacter::RageModeAction(const FInputActionValue& inputValue)
 {
 	//------------------------------------------------------------
 	if ( CurrentRage >= 100.0f ) {
+		RageModeUI->AddToViewport();
+
 		mState = EKratosState::Rage;
 
 		//카메라 셰이크 재생
@@ -826,6 +830,9 @@ void AKratosCharacter::RageMode()
 
 	if ( CurrentRage <= 0.0f )
 	{
+		//분노 모드 UI 비활성화
+		RageModeUI->RemoveFromParent();
+
 		mState = EKratosState::Idle;
 
 		GetWorld()->GetTimerManager().ClearTimer(RageTimerHandle);

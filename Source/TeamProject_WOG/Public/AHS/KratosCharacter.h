@@ -403,6 +403,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = CameraMotion)
 	TSubclassOf<class UCameraShakeBase> CameraShake;
 
+	//====================================================
+	// 분노 모드 시 화면 전환 색
+	UPROPERTY(EditDefaultsOnly, Category = RageModeUI)
+	TSubclassOf<class UUserWidget> RageModeUIFactory;
+
+	// 도끼 Aim UI 위젯 인스턴스
+	UPROPERTY()
+	class UUserWidget* RageModeUI;
+
 
 
 	//-------------------------------------------------------------------
