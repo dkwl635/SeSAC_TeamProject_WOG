@@ -392,6 +392,10 @@ void AKratosCharacter::AimAxeAttack(const FInputActionValue& inputValue)
 
 	if ( Kratos_EquippedWeapon && Kratos_HasWeapon) {
 		if ( AimAttackState == false ) {
+
+			// 무기 Aim SFX 재생
+			UGameplayStatics::PlaySound2D(GetWorld() , AimAxeSound);
+
 			IsAiming(true);
 		}
 		else {
@@ -454,6 +458,9 @@ void AKratosCharacter::SheathAction(const FInputActionValue& inputValue)
 	}
 
 	if ( Kratos_HasWeapon == true ) {
+		// 무기 장착 SFX 재생
+		UGameplayStatics::PlaySound2D(GetWorld() , SheathAxeSound);
+
 		if ( Kratos_EquippedWeapon == true ) {
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			AnimInstance->Montage_Play(UnEquip_Axe_Montage);
@@ -639,7 +646,7 @@ void AKratosCharacter::OnHandOverlapBP(AActor* OtherActor , FVector SweepResult)
 			DamageData.DamageValue = 10;
 		}
 		else {
-			DamageData.DamageValue = 30;
+			DamageData.DamageValue = 20;
 		}
 		
 		DamageData.HitPoint = SweepResult;
@@ -664,6 +671,9 @@ void AKratosCharacter::OnHandOverlapBP(AActor* OtherActor , FVector SweepResult)
 		}
 		} , 1.0f , false);
 		*/
+
+		// 적이 맞았을 때 SFX 재생
+		UGameplayStatics::PlaySound2D(GetWorld() , HitEnemySound);
 	}
 }
 

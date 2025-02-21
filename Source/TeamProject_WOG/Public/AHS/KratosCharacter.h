@@ -420,6 +420,18 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UParticleSystem* BloodVFX;
 
+	//=======================================================
+	// 적에게 공격이 맞았을 때 재생되는 SFX
+	UPROPERTY(EditAnywhere)
+	class USoundBase*	HitEnemySound;
+
+	// 무기 장착 SFX
+	UPROPERTY(EditAnywhere)
+	class USoundBase* SheathAxeSound;
+
+	// 무기 Aim SFX
+	UPROPERTY(EditAnywhere)
+	class USoundBase* AimAxeSound;
 
 
 	//-------------------------------------------------------------------
