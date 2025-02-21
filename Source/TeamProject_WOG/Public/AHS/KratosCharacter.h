@@ -433,6 +433,17 @@ public:
 	UPROPERTY(EditAnywhere)
 	class USoundBase* AimAxeSound;
 
+	// 던진 무기 SFX
+	UPROPERTY(EditAnywhere)
+	class USoundBase* ThrowedAxeSound;
+
+	// Rage Mode SFX
+	UPROPERTY(EditAnywhere)
+	class USoundBase* RageMode1Sound;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* RageMode2Sound;
+
 
 	//-------------------------------------------------------------------
 	// ICombatInterface을(를) 통해 상속됨

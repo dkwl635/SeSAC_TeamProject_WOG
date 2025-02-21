@@ -523,6 +523,9 @@ void AKratosCharacter::AttackAction(const FInputActionValue& inputValue)
 		if ( Kratos_EquippedWeapon == true ) {
 			// 원거리 공격
 			if ( AimAttackState == true ) {
+				// 도끼 던지기 SFX 재생
+				UGameplayStatics::PlaySound2D(GetWorld() , ThrowedAxeSound);
+
 				ClickOnce = true;
 
 				UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -832,6 +835,10 @@ void AKratosCharacter::RageModeAction(const FInputActionValue& inputValue)
 {
 	//------------------------------------------------------------
 	if ( CurrentRage >= 100.0f ) {
+		// Rage Mode SFX 재생
+		UGameplayStatics::PlaySound2D(GetWorld() , RageMode1Sound);
+		UGameplayStatics::PlaySound2D(GetWorld() , RageMode2Sound);
+
 		RageModeUI->AddToViewport();
 
 		mState = EKratosState::Rage;
