@@ -133,8 +133,10 @@ void AKratosCharacter::BeginPlay()
 		}
 	}
 
-	//2. Aim UI + Main UI
+	//2. Aim UI + Main UI, RageMode 생성
 	AimAxeUI = CreateWidget(GetWorld(), AimAxeUIFactory);
+	RageModeUI = CreateWidget(GetWorld() , RageModeUIFactory);
+
 	MainUI = CreateWidget<UMainUI>(GetWorld(), MainUIFactory);
 	MainUI->AddToViewport();
 
@@ -212,7 +214,15 @@ void AKratosCharacter::Tick(float DeltaTime)
 			}
 		
 		} break;
-		case EKratosState::Rage: { } break;
+		case EKratosState::Rage: { 
+			Direction = FVector::ZeroVector;
+
+			currentTime += GetWorld()->DeltaTimeSeconds;
+			if ( currentTime >= 1.5f ) {
+				mState = EKratosState::Idle;
+				currentTime = 0.0f;
+			}
+		} break;
 		case EKratosState::Damage: { 
 			Direction = FVector::ZeroVector;
 
@@ -382,6 +392,10 @@ void AKratosCharacter::AimAxeAttack(const FInputActionValue& inputValue)
 
 	if ( Kratos_EquippedWeapon && Kratos_HasWeapon) {
 		if ( AimAttackState == false ) {
+
+			// 무기 Aim SFX 재생
+			UGameplayStatics::PlaySound2D(GetWorld() , AimAxeSound);
+
 			IsAiming(true);
 		}
 		else {
@@ -444,6 +458,9 @@ void AKratosCharacter::SheathAction(const FInputActionValue& inputValue)
 	}
 
 	if ( Kratos_HasWeapon == true ) {
+		// 무기 장착 SFX 재생
+		UGameplayStatics::PlaySound2D(GetWorld() , SheathAxeSound);
+
 		if ( Kratos_EquippedWeapon == true ) {
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			AnimInstance->Montage_Play(UnEquip_Axe_Montage);
@@ -629,7 +646,7 @@ void AKratosCharacter::OnHandOverlapBP(AActor* OtherActor , FVector SweepResult)
 			DamageData.DamageValue = 10;
 		}
 		else {
-			DamageData.DamageValue = 30;
+			DamageData.DamageValue = 20;
 		}
 		
 		DamageData.HitPoint = SweepResult;
@@ -639,6 +656,24 @@ void AKratosCharacter::OnHandOverlapBP(AActor* OtherActor , FVector SweepResult)
 		//카메라 셰이크 재생
 		auto controller = GetWorld()->GetFirstPlayerController();
 		controller->PlayerCameraManager->StartCameraShake(CameraShake);
+
+		// VFX 생성(피 효과)
+		/*
+		UParticleSystemComponent* SpawnedVFX = UGameplayStatics::SpawnEmitterAtLocation(GetWorld() , BloodVFX , AxeCollision->GetComponentTransform());
+
+		// 1초 후 삭제 예약
+		FTimerHandle TimerHandle_Blood;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_Blood , [SpawnedVFX]()
+		{
+		if ( SpawnedVFX )
+		{
+			SpawnedVFX->DestroyComponent();
+		}
+		} , 1.0f , false);
+		*/
+
+		// 적이 맞았을 때 SFX 재생
+		UGameplayStatics::PlaySound2D(GetWorld() , HitEnemySound);
 	}
 }
 
@@ -674,6 +709,8 @@ void AKratosCharacter::TakeKDamage(const FWOG_DamageEvent& DamageEvent , ICombat
 	FString logMsg = TEXT("Kratos Take Damage!");
 	GEngine->AddOnScreenDebugMessage(0 , 1 , FColor::Red , logMsg);
 	UE_LOG(LogTemp , Warning , TEXT("Kratos Take Damage!"));
+
+	OnKratosDamageBP();
 }
 
 USkeletalMeshComponent* AKratosCharacter::GetSkeletalMesh()
@@ -795,6 +832,8 @@ void AKratosCharacter::RageModeAction(const FInputActionValue& inputValue)
 {
 	//------------------------------------------------------------
 	if ( CurrentRage >= 100.0f ) {
+		RageModeUI->AddToViewport();
+
 		mState = EKratosState::Rage;
 
 		//카메라 셰이크 재생
@@ -804,6 +843,20 @@ void AKratosCharacter::RageModeAction(const FInputActionValue& inputValue)
 		//--------------------------------------------------------
 		bRageMode = true;
 
+		// VFX 소환
+		UParticleSystemComponent* SpawnedVFX = UGameplayStatics::SpawnEmitterAtLocation(GetWorld() , RagemodeVFX , GetActorLocation());
+
+		// 1초 후 삭제 예약
+		FTimerHandle TimerHandle_RageVFX;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_RageVFX , [SpawnedVFX]()
+		{
+		if ( SpawnedVFX )
+		{
+			SpawnedVFX->DestroyComponent();
+		}
+		} , 2.0f , false);
+
+		//-----------------------------------------------------------
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_Play(RageMode_Start_Montage);
 
@@ -826,6 +879,9 @@ void AKratosCharacter::RageMode()
 
 	if ( CurrentRage <= 0.0f )
 	{
+		//분노 모드 UI 비활성화
+		RageModeUI->RemoveFromParent();
+
 		mState = EKratosState::Idle;
 
 		GetWorld()->GetTimerManager().ClearTimer(RageTimerHandle);
@@ -936,10 +992,11 @@ void AKratosCharacter::OnKratosDamageBP()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(TakeDamage_Montage);
 
-
 	// 데미지 적용, HP 업데이트
 	SetKratosHP(-10.0f);
 	MainUI->SetKratosHP(CurrentHealth , MaxHealth);
+
+	
 	
 }
 

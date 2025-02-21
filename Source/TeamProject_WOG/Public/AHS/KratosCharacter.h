@@ -403,6 +403,35 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = CameraMotion)
 	TSubclassOf<class UCameraShakeBase> CameraShake;
 
+	//====================================================
+	// 분노 모드 시 화면 전환 색
+	UPROPERTY(EditDefaultsOnly, Category = RageModeUI)
+	TSubclassOf<class UUserWidget> RageModeUIFactory;
+
+	// 도끼 Aim UI 위젯 인스턴스
+	UPROPERTY()
+	class UUserWidget* RageModeUI;
+
+	// 분노 모드 시작시 생성되는 불 이펙트
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* RagemodeVFX;
+
+	// 적 Body와 오버랩 충돌이 되었을 때, 피 이펙트
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* BloodVFX;
+
+	//=======================================================
+	// 적에게 공격이 맞았을 때 재생되는 SFX
+	UPROPERTY(EditAnywhere)
+	class USoundBase*	HitEnemySound;
+
+	// 무기 장착 SFX
+	UPROPERTY(EditAnywhere)
+	class USoundBase* SheathAxeSound;
+
+	// 무기 Aim SFX
+	UPROPERTY(EditAnywhere)
+	class USoundBase* AimAxeSound;
 
 
 	//-------------------------------------------------------------------
