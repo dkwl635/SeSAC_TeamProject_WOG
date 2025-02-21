@@ -36,7 +36,7 @@ protected:
 	virtual void InitPattern(class AThor* Thor) override;
 	virtual void StartPattern_CBP() override;
 	virtual void NotifyEventPattern_C(int32 EventIndex) override;
-
+	virtual void StopPattern_C() override;
 
 	FTimerHandle SpawnLightingTimerHandle;
 	void SpawnLightings();

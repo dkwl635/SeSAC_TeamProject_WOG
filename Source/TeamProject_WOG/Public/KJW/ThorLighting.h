@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditAnywhere , BlueprintReadWrite)
 	class USphereComponent* SphereComp;
 
+	UPROPERTY(EditAnywhere , BlueprintReadWrite)
+	class UStaticMeshComponent* GroundMeshComp;
+
 
 	UFUNCTION(BlueprintNativeEvent)
 	void SpawnLighting();
@@ -42,5 +45,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	float Damage = 10;
 
+	void ShowGroundMesh();
 
 };

@@ -79,7 +79,9 @@ public:
 	UPROPERTY(EditAnywhere , Category = PatternClass)
 	TArray<TSubclassOf<class UThorPattern>> PatternClass;
 	
-
+	//토르 사망 몽타주
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* DeathAnimMontage;
 	
 	void InitPatternClass();
 
@@ -170,4 +172,10 @@ public:
 
 		FSimpleDelegate UpdateHp;
 		FSimpleDelegate UpdateStun;
+
+
+		UFUNCTION(BlueprintNativeEvent)
+		void DieEvent();
+
+		void DieEvent_Implementation();
 };

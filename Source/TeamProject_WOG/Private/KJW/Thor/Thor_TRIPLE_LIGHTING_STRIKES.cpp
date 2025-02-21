@@ -38,6 +38,14 @@ void UThor_TRIPLE_LIGHTING_STRIKES::NotifyEventPattern_C(int32 EventIndex)
 		
 }
 
+void UThor_TRIPLE_LIGHTING_STRIKES::StopPattern_C()
+{
+	for ( int32 i = 0; i < ThorLightings.Num(); i++ )
+	{
+		ThorLightings[i]->SetActorLocation(FVector(0.0f , 0.0f , -10000.f));
+	}
+}
+
 void UThor_TRIPLE_LIGHTING_STRIKES::SpawnLightings()
 {
 	FVector targetPos = Owner->Target->GetActorLocation();
@@ -58,7 +66,7 @@ void UThor_TRIPLE_LIGHTING_STRIKES::SpawnLightings()
 	}
 	LightPos.Z = 0.0f;
 	ThorLightings[LightingSpawnCount]->SetActorLocation(LightPos);
-
+	ThorLightings[LightingSpawnCount]->ShowGroundMesh();
 	if (LightingSpawnCount == 2)
 	{
 		Owner->GetWorldTimerManager().ClearTimer(SpawnLightingTimerHandle);

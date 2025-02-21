@@ -12,7 +12,12 @@ AThorLighting::AThorLighting()
 	PrimaryActorTick.bCanEverTick = true;
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	GroundMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GroundMeshComp"));
+
 	SetRootComponent(SphereComp);
+	GroundMeshComp->SetupAttachment(GetRootComponent());
+	
+
 }
 
 // Called when the game starts or when spawned
@@ -43,5 +48,10 @@ void AThorLighting::TakeLightingDamage()
 		Thor->Target->TakeKDamage(DamageData , Thor);
 	}
 	
+}
+
+void AThorLighting::ShowGroundMesh()
+{
+	GroundMeshComp->SetVisibility(true);
 }
 

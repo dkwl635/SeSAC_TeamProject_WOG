@@ -70,18 +70,30 @@ void AThor::Tick(float DeltaTime)
 		CurPattern->TickPattern();
 	}
 
+
 	//만약 데미지를 받은 상태 라면
 	if ( IsHit )
 	{
-		if ( CurPattern )
+		if ( StunValue >= StunMaxValue )
+		{
+			if ( CurPattern != GetPattern(EThorPattern::STUN) )
+			{
+				CurPattern->StopPattern();
+				StartPattarn(EThorPattern::STUN);
+			}
+		}
+		else if ( CurPattern )
 		{
 			//현재 패턴에서 HIT상태로 변환가능한지
-			if ( CurPattern->IsHitable() && GetPattern(EThorPattern::HIT)->IsHitable())
+			if ( CurPattern->IsHitable() && GetPattern(EThorPattern::HIT)->IsHitable() )
 			{
-				//CurPattern->StopPattern();
+				CurPattern->StopPattern();
 				StartPattarn(EThorPattern::HIT);
 			}
 		}
+
+		
+	
 		IsHit = false;
 	}
 }
@@ -106,7 +118,8 @@ void AThor::SetCharacterState(EWOG_Character_State NewState)
 void AThor::TakeKDamage( const FWOG_DamageEvent& DamageEvent, ICombatInterface* DamageCauser)
 {
 	if ( Hp <= 0 ) { return; }
-	
+	if ( CurPattern == GetPattern(EThorPattern::STUN) ) { return; }
+
 	float DamageValue = DamageEvent.DamageValue;
 
 	if ( GEngine )
@@ -117,11 +130,22 @@ void AThor::TakeKDamage( const FWOG_DamageEvent& DamageEvent, ICombatInterface* 
 	IsHit = true;
 
 	Hp -= DamageValue;
-	StunValue += 5;
+	StunValue += 10;
 
 	if ( UpdateHp.IsBound() )UpdateHp.Execute();
 	if ( UpdateStun.IsBound() )UpdateStun.Execute();
 
+
+	if ( Hp <= 0 )
+	{
+		ThorAnimIns->Montage_Play(DeathAnimMontage);
+		DieEvent();
+	}
+
+	if ( StunValue >= StunMaxValue )
+	{
+		StunValue = StunMaxValue;
+	}
 
 	
 }
@@ -325,6 +349,10 @@ void AThor::ToggleAI()
 	{
 		a->IsAI = !( a->IsAI );
 	}
+}
+
+void AThor::DieEvent_Implementation()
+{
 }
 
 

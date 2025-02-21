@@ -49,5 +49,5 @@ protected:
 	virtual void NotifyTickPattrern_C(int32 EventIndex , float FrameDeltaTime) override;
 	virtual void EndPattern_CBP() override;
 	virtual bool IsStartable() override;
-
+	virtual void StopPattern_C() override;
 };
