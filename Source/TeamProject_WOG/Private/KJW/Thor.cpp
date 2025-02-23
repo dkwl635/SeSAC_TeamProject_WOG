@@ -52,7 +52,7 @@ void AThor::BeginPlay()
 
 	InitPatternClass();
 	//토르 맵 판단크기
-	DrawDebugSphere(GetWorld() , GetActorLocation() , MapSize , 12 , FColor::Blue , false , 15.0f , 0);
+	//DrawDebugSphere(GetWorld() , GetActorLocation() , MapSize , 12 , FColor::Blue , false , 15.0f , 0);
 
 
 	WeaponEffect->Deactivate();
