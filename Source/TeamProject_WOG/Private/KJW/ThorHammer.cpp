@@ -7,6 +7,7 @@
 #include "AHS/KratosCharacter.h"
 #include "KJW/Thor.h"
 #include "NiagaraComponent.h"
+#include "Sound/SoundWave.h"
 
 // Sets default values
 AThorHammer::AThorHammer()
@@ -143,6 +144,8 @@ void AThorHammer::OverlapHammer(UPrimitiveComponent* OverlappedComponent , AActo
 			DamageData.DamageValue = 10;
 			DamageData.HitPoint = GetActorLocation();
 			Thor->Target->TakeKDamage(DamageData , Thor);
+
+			UGameplayStatics::PlaySoundAtLocation(this , HitSoundWave , GetActorLocation());
 		}
 	}
 	else

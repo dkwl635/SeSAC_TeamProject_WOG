@@ -43,7 +43,7 @@ void UThor_ATTACK_THUNDER_CLAP::NotifyEventPattern_C(int32 EventIndex)
 		bool bHit = Owner->GetWorld()->SweepSingleByChannel(OutHit , Start , Start , FQuat::Identity , EWOGTraceChannel::EnemyAttackTrace , FCollisionShape::MakeSphere(AttackRadius) , CollisionParams);
 
 		FColor SphereColor = bHit ? FColor::Red : FColor::Green;
-		DrawDebugSphere(Owner->GetWorld() , Start , AttackRadius , 12 , SphereColor , false , 1.0f , 0 , 2.0f);
+		//DrawDebugSphere(Owner->GetWorld() , Start , AttackRadius , 12 , SphereColor , false , 1.0f , 0 , 2.0f);
 
 		if ( bHit )
 		{
@@ -60,7 +60,6 @@ void UThor_ATTACK_THUNDER_CLAP::NotifyEventPattern_C(int32 EventIndex)
 		SpawnPos = Owner->GetActorLocation() + Owner->GetActorForwardVector() * AttackRadius * 0.5f;
 		SpawnPos.Z += 50.0f;
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld() , Effect , SpawnPos , Owner->GetActorForwardVector().Rotation() , FVector(1.0f));
-		
 
 	}
 

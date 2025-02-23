@@ -72,19 +72,10 @@ void UThor_ATTACK_HAMMER_THROW_START::StartPattern_C()
 
 			int32 moveIndex = FMath::RandRange(0, MoveableVector.Num() -1);
 			//디버그
-			for (int32 i = 0; i < MoveableVector.Num(); i++)
-			{
-				DrawDebugLine(
-					Owner->GetWorld(),
-					MoveableVector[i],
-					MoveableVector[i] + FVector(0, 0, 100), // 위쪽으로 100 유닛
-					i == moveIndex ?FColor::Green : FColor::Red , // 랜덤좌표면 
-					false,       // 지속 시간 지나면 사라지도록 설정
-					2.0f,        // 지속 시간 (2초)
-					0,           // 우선순위
-					2.0f         // 선 두께
-				);
-			}
+			//for (int32 i = 0; i < MoveableVector.Num(); i++)
+			//{
+			//	DrawDebugLine(Owner->GetWorld() , MoveableVector[i],MoveableVector[i] + FVector(0, 0, 100), i == moveIndex ?FColor::Green : FColor::Red ,false,	2.0f , 0,2.0f);
+			//}
 			
 			//디버그	
 			StartPos = Owner->GetActorLocation();

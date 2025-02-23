@@ -36,7 +36,7 @@ void UThor_TRIPLE_HAMMER_STRIKES::NotifyEventPattern_C(int32 EventIndex)
 	bool bHit = Owner->GetWorld()->SweepSingleByChannel(OutHit , Start , Start , FQuat::Identity , ECC_Visibility , FCollisionShape::MakeSphere(Radius) , CollisionParams);
 
 	FColor SphereColor = bHit ? FColor::Red : FColor::Green;
-	DrawDebugSphere(Owner->GetWorld() , Start , Radius , 12 , SphereColor , false , 1.0f , 0 , 2.0f);
+	//DrawDebugSphere(Owner->GetWorld() , Start , Radius , 12 , SphereColor , false , 1.0f , 0 , 2.0f);
 
 	if ( bHit )
 	{

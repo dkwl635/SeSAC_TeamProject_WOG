@@ -64,4 +64,7 @@ private:
 public:
 	UPROPERTY(EditAnywhere , BlueprintReadWrite)
 	class UNiagaraComponent* WeaponEffect;
+	
+	UPROPERTY(EditAnywhere)
+	class USoundWave* HitSoundWave;
 };

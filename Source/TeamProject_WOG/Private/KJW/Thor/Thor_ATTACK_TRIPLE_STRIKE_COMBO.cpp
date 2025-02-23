@@ -57,7 +57,7 @@ void UThor_ATTACK_TRIPLE_STRIKE_COMBO::NotifyEventPattern_C(int32 EventIndex)
 	bool bHit = Owner->GetWorld()->SweepSingleByChannel(OutHit, Start, Start, FQuat::Identity, EWOGTraceChannel::EnemyAttackTrace, FCollisionShape::MakeSphere(Radius), CollisionParams);
 	
 	FColor SphereColor = bHit ? FColor::Red : FColor::Green;
-	DrawDebugSphere(Owner->GetWorld(), Start, Radius, 12, SphereColor, false, 1.0f, 0, 2.0f);
+	//DrawDebugSphere(Owner->GetWorld(), Start, Radius, 12, SphereColor, false, 1.0f, 0, 2.0f);
 
 	if (bHit)
 	{
