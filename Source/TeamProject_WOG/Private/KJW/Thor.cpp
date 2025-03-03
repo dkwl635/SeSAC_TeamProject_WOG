@@ -8,6 +8,7 @@
 #include "KJW/Thor/Thor_Idle.h"
 #include "KJW/Thor/Thor_HIT.h"
 #include "KJW/ThorHammer.h"
+#include "MainUI.h"
 #include "NiagaraComponent.h"
 
 // Sets default values
@@ -139,6 +140,9 @@ void AThor::TakeKDamage( const FWOG_DamageEvent& DamageEvent, ICombatInterface* 
 	if ( Hp <= 0 )
 	{
 		ThorAnimIns->Montage_Play(DeathAnimMontage);
+
+		Target->MainUI->RemoveFromParent();
+
 		DieEvent();
 	}
 
